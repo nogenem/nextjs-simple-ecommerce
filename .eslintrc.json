@@ -11,5 +11,14 @@
   ],
   "rules": {
     "@typescript-eslint/consistent-type-imports": "warn"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["lint-staged.config.js"],
+      "extends": ["next/core-web-vitals", "prettier"],
+      "rules": {
+        "@typescript-eslint/no-var-requires": "off"
+      }
+    }
+  ]
 }
