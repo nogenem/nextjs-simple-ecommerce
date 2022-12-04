@@ -1,10 +1,11 @@
 import { type NextPage } from 'next';
 import Head from 'next/head';
 
-import { trpc } from '~/shared/utils/trpc';
+import { MoonIcon, SunIcon } from '@chakra-ui/icons';
+import { Box, IconButton, Tooltip, useColorMode } from '@chakra-ui/react';
 
 const Home: NextPage = () => {
-  const hello = trpc.example.hello.useQuery({ text: 'from tRPC' });
+  const { colorMode, toggleColorMode } = useColorMode();
 
   return (
     <>
@@ -13,7 +14,25 @@ const Home: NextPage = () => {
         <meta name="description" content="A simple ECommerce example" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>{hello.data?.greeting}</main>
+      <main>
+        <Box w="100%" p={4}>
+          <Tooltip label="toggle dark/light mode">
+            <IconButton
+              onClick={toggleColorMode}
+              aria-label="toggle dark/light mode"
+              icon={
+                colorMode === 'light' ? (
+                  <MoonIcon fontSize="1.25rem" />
+                ) : (
+                  <SunIcon fontSize="1.25rem" />
+                )
+              }
+              border="1px solid"
+              borderColor={`mode.${colorMode}.text`}
+            />
+          </Tooltip>
+        </Box>
+      </main>
     </>
   );
 };
