@@ -9,7 +9,11 @@
     "dev": "next dev",
     "start": "next start",
     "lint": "next lint --fix",
-    "prettier": "prettier --write ."
+    "prettier": "prettier --write .",
+    "dev:pscale:connect": "pscale connect simple-ecommerce initial-setup --port 3309",
+    "prisma:studio": "npx prisma studio",
+    "prisma:push": "npx prisma db push",
+    "prisma:seed": "npx prisma db seed"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.0.13",
