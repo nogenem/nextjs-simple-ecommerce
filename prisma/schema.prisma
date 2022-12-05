@@ -15,16 +15,18 @@ datasource db {
   relationMode = "prisma"
 }
 
-model Example {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum AttributeType {
+  Color
+  Size
+}
+
+enum CurrencyCode {
+  USD
 }
 
 // Necessary for Next auth
 model Account {
   id                String  @id @default(cuid())
-  userId            String
   type              String
   provider          String
   providerAccountId String
@@ -36,6 +38,7 @@ model Account {
   id_token          String? @db.Text
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
 
   @@unique([provider, providerAccountId])
   @@index([userId])
@@ -44,9 +47,9 @@ model Account {
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
-  userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
 
   @@index([userId])
 }
@@ -67,4 +70,74 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Product {
+  id               String    @id @default(cuid())
+  slug             String    @unique
+  name             String    @db.Text
+  description      String    @default("") @db.Text
+  description_html String    @default("") @db.Text
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @default(now()) @updatedAt
+  variants         Variant[]
+  category         Category  @relation(fields: [categoryId], references: [id])
+  categoryId       String
+  discount         Discount? @relation(fields: [discountId], references: [id])
+  discountId       String?
+
+  @@index([categoryId])
+  @@index([discountId])
+}
+
+model Variant {
+  id                 String         @id @default(cuid())
+  price              Int
+  currency_code      CurrencyCode   @default(USD)
+  sku                String
+  quantity_in_stock  Int
+  available_for_sale Boolean        @default(true)
+  sold_amount        Int            @default(0)
+  created_at         DateTime       @default(now())
+  updated_at         DateTime       @default(now()) @updatedAt
+  attributes         Attribute[]
+  images             VariantImage[]
+  product            Product        @relation(fields: [productId], references: [id])
+  productId          String
+
+  @@index([productId])
+}
+
+model Category {
+  id         String    @id @default(cuid())
+  name       String    @unique
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now()) @updatedAt
+  products   Product[]
+}
+
+model Discount {
+  id          String    @id @default(cuid())
+  percent     Int
+  valid_until DateTime
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @default(now()) @updatedAt
+  products    Product[]
+}
+
+model Attribute {
+  id         String        @id @default(cuid())
+  type       AttributeType
+  name       String
+  value      String
+  created_at DateTime      @default(now())
+  updated_at DateTime      @default(now()) @updatedAt
+  variants   Variant[]
+}
+
+model VariantImage {
+  id               String    @id @default(cuid())
+  alternative_text String
+  url              String    @db.Text
+  variant          Variant[]
 }
