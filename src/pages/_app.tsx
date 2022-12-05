@@ -6,6 +6,7 @@ import type { AppProps } from 'next/app';
 import { type AppType } from 'next/app';
 
 import { ChakraProvider } from '@chakra-ui/react';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import { DefaultLayout } from '~/shared/components';
 import { theme } from '~/shared/theme';
@@ -29,6 +30,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
     <ChakraProvider theme={theme}>
       <SessionProvider session={session}>
         {getLayout(<Component {...pageProps} />)}
+        <ReactQueryDevtools initialIsOpen={false} />
       </SessionProvider>
     </ChakraProvider>
   );
