@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { Box, Flex } from '@chakra-ui/react';
 
 import { HomeFiltersContainer } from '~/features/products/components';
+import { ProductCard } from '~/features/products/components/product-card';
 import { useHomeProducts } from '~/features/products/hooks';
 
 const Home: NextPage = () => {
@@ -21,8 +22,16 @@ const Home: NextPage = () => {
         {products.isSuccess && (
           <>
             <HomeFiltersContainer />
-            <Flex wrap="wrap" grow="1" w="100%">
-              Products
+            <Flex
+              w="100%"
+              wrap="wrap"
+              grow="1"
+              justify={{ base: 'center', md: 'flex-start' }}
+              gap="3"
+            >
+              {products.data.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
             </Flex>
           </>
         )}

@@ -30,6 +30,9 @@ const config = {
       },
     ];
   },
+  images: {
+    domains: ['res.cloudinary.com', 'via.placeholder.com'],
+  },
 };
 
 export default config;
