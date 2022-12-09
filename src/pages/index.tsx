@@ -3,10 +3,10 @@ import Head from 'next/head';
 
 import { Box } from '@chakra-ui/react';
 
-import { trpc } from '~/shared/utils/trpc';
+import { useHomeProducts } from '~/features/products/hooks';
 
 const Home: NextPage = () => {
-  const hello = trpc.example.hello.useQuery({ text: 'from tRPC' });
+  const products = useHomeProducts();
 
   return (
     <>
@@ -15,7 +15,12 @@ const Home: NextPage = () => {
         <meta name="description" content="A simple ECommerce example" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Box w="100%">Home - {hello.data?.greeting}</Box>
+      <Box w="100%">
+        {products.isLoading && <Box w="100%">Loading...</Box>}
+        {products.isSuccess && (
+          <pre>{JSON.stringify(products.data, null, 2)}</pre>
+        )}
+      </Box>
     </>
   );
 };
