@@ -21,6 +21,7 @@ const HomeFiltersContainer = () => {
       <ColorFilterRow />
       <Divider />
       <SizeFilterRow />
+      <Divider display={{ base: 'block', md: 'none' }} />
     </Flex>
   );
 };
