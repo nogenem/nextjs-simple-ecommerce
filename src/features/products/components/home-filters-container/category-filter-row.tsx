@@ -1,7 +1,7 @@
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 
-import { Box, Flex, Heading, Link } from '@chakra-ui/react';
+import { Box, Flex, Heading, Link, useColorModeValue } from '@chakra-ui/react';
 
 import { useCategories } from '~/features/categories/hooks';
 import type { RouterOutputs } from '~/shared/utils/trpc';
@@ -32,6 +32,7 @@ const CategoryFilterItem = ({
   category: RouterOutputs['categories']['all'][number];
 }) => {
   const { pathname, query } = useRouter();
+  const activeColor = useColorModeValue('primary.600', 'white');
 
   return (
     <NextLink
@@ -44,6 +45,7 @@ const CategoryFilterItem = ({
     >
       <Link
         textDecor={query.category_id === category.id ? 'underline' : 'unset'}
+        color={query.category_id === category.id ? activeColor : ''}
       >
         {category.name}
       </Link>
