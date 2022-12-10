@@ -1,20 +1,20 @@
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 
-import { Box, Flex, Heading, Link, useColorModeValue } from '@chakra-ui/react';
+import { Box, Flex, Link, useColorModeValue } from '@chakra-ui/react';
 import { AttributeType } from '@prisma/client';
 
 import { useAttributes } from '~/features/attributes/hooks';
 import type { RouterOutputs } from '~/shared/utils/trpc';
+
+import { FilterRowHeader } from './filter-row-header';
 
 const SizeFilterRow = () => {
   const sizes = useAttributes({ type: AttributeType.Size });
 
   return (
     <Flex w="100%" direction="column">
-      <Heading mb="2" size="sm">
-        Sizes
-      </Heading>
+      <FilterRowHeader label="Sizes" queryParamKeys={['size_id']} />
       {sizes.isLoading && <Box>Loading...</Box>}
       {!!sizes.data && (
         <Flex direction="column" gap="2" maxH="250" overflowY="auto">

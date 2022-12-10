@@ -3,27 +3,20 @@ import { MdCircle } from 'react-icons/md';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 
-import {
-  Box,
-  Flex,
-  Heading,
-  Icon,
-  Tooltip,
-  useColorModeValue,
-} from '@chakra-ui/react';
+import { Box, Flex, Icon, Tooltip, useColorModeValue } from '@chakra-ui/react';
 import { AttributeType } from '@prisma/client';
 
 import { useAttributes } from '~/features/attributes/hooks';
 import type { RouterOutputs } from '~/shared/utils/trpc';
+
+import { FilterRowHeader } from './filter-row-header';
 
 const ColorFilterRow = () => {
   const colors = useAttributes({ type: AttributeType.Color });
 
   return (
     <Flex w="100%" direction="column">
-      <Heading mb="2" size="sm">
-        Colors
-      </Heading>
+      <FilterRowHeader label="Colors" queryParamKeys={['color_id']} />
       {colors.isLoading && <Box>Loading...</Box>}
       {!!colors.data && (
         <Flex direction="row" gap="2">

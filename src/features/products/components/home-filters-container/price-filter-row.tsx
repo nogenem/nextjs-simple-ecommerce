@@ -13,6 +13,8 @@ import {
   NumberInputStepper,
 } from '@chakra-ui/react';
 
+import { FilterRowHeader } from './filter-row-header';
+
 const PriceFilterRow = () => {
   const router = useRouter();
 
@@ -74,6 +76,10 @@ const PriceFilterRow = () => {
 
   return (
     <Flex direction="column">
+      <FilterRowHeader
+        label="Price"
+        queryParamKeys={['min_price', 'max_price']}
+      />
       <FormControl mb="2">
         <FormLabel>Min. price</FormLabel>
         <NumberInput min={0} value={minPrice} onChange={handleMinPriceChange}>
