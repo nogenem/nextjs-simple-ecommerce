@@ -3,6 +3,7 @@ import { Divider, Flex } from '@chakra-ui/react';
 import { CategoryFilterRow } from './category-filter-row';
 import { ColorFilterRow } from './color-filter-row';
 import { PriceFilterRow } from './price-filter-row';
+import { SizeFilterRow } from './size-filter-row';
 
 const HomeFiltersContainer = () => {
   return (
@@ -18,6 +19,8 @@ const HomeFiltersContainer = () => {
       <PriceFilterRow />
       <Divider />
       <ColorFilterRow />
+      <Divider />
+      <SizeFilterRow />
     </Flex>
   );
 };
