@@ -1,5 +1,7 @@
 import { Flex } from '@chakra-ui/react';
 
+import { CategoryFilterRow } from './category-filter-row';
+
 const HomeFiltersContainer = () => {
   return (
     <Flex
@@ -7,7 +9,7 @@ const HomeFiltersContainer = () => {
       width={{ base: '100%', md: '19rem' }}
       mb={{ base: '2', md: '0' }}
     >
-      Filters
+      <CategoryFilterRow />
     </Flex>
   );
 };

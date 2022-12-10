@@ -1,8 +1,10 @@
+import { categoriesRouter } from '~/features/categories/router';
 import { productsRouter } from '~/features/products/router';
 import { router } from '~/server/trpc/trpc';
 
 export const appRouter = router({
   products: productsRouter,
+  categories: categoriesRouter,
 });
 
 // export type definition of API
