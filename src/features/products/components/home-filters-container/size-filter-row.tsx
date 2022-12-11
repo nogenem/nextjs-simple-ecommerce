@@ -5,6 +5,7 @@ import { Box, Flex, Link, useColorModeValue } from '@chakra-ui/react';
 import { AttributeType } from '@prisma/client';
 
 import { useAttributes } from '~/features/attributes/hooks';
+import { SIZE_ID } from '~/features/filtering/constants/url-query-keys';
 import type { RouterOutputs } from '~/shared/utils/trpc';
 
 import { FilterRowHeader } from './filter-row-header';
@@ -14,7 +15,7 @@ const SizeFilterRow = () => {
 
   return (
     <Flex w="100%" direction="column">
-      <FilterRowHeader label="Sizes" queryParamKeys={['size_id']} />
+      <FilterRowHeader label="Sizes" queryParamKeys={[SIZE_ID]} />
       {sizes.isLoading && <Box>Loading...</Box>}
       {!!sizes.data && (
         <Flex direction="column" gap="2" maxH="250" overflowY="auto">
@@ -39,14 +40,14 @@ const SizeFilterItem = ({
     <NextLink
       href={{
         pathname,
-        query: { ...query, size_id: size.id },
+        query: { ...query, [SIZE_ID]: size.id },
       }}
       passHref
       legacyBehavior
     >
       <Link
-        textDecor={query.size_id === size.id ? 'underline' : 'unset'}
-        color={query.size_id === size.id ? activeColor : ''}
+        textDecor={query[SIZE_ID] === size.id ? 'underline' : 'unset'}
+        color={query[SIZE_ID] === size.id ? activeColor : ''}
       >
         {size.name}
       </Link>

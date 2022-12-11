@@ -13,6 +13,11 @@ import {
   NumberInputStepper,
 } from '@chakra-ui/react';
 
+import {
+  MAX_PRICE,
+  MIN_PRICE,
+} from '~/features/filtering/constants/url-query-keys';
+
 import { FilterRowHeader } from './filter-row-header';
 
 const PriceFilterRow = () => {
@@ -27,15 +32,15 @@ const PriceFilterRow = () => {
     };
 
     if (nextMinPrice !== '') {
-      query.min_price = nextMinPrice;
+      query[MIN_PRICE] = nextMinPrice;
     } else {
-      delete query.min_price;
+      delete query[MIN_PRICE];
     }
 
     if (nextMaxPrice !== '') {
-      query.max_price = nextMaxPrice;
+      query[MAX_PRICE] = nextMaxPrice;
     } else {
-      delete query.max_price;
+      delete query[MAX_PRICE];
     }
 
     const url = {
@@ -76,10 +81,7 @@ const PriceFilterRow = () => {
 
   return (
     <Flex direction="column">
-      <FilterRowHeader
-        label="Price"
-        queryParamKeys={['min_price', 'max_price']}
-      />
+      <FilterRowHeader label="Price" queryParamKeys={[MIN_PRICE, MAX_PRICE]} />
       <FormControl mb="2">
         <FormLabel>Min. price</FormLabel>
         <NumberInput min={0} value={minPrice} onChange={handleMinPriceChange}>
