@@ -7,7 +7,7 @@ import { Box, Flex, Icon, Tooltip, useColorModeValue } from '@chakra-ui/react';
 import { AttributeType } from '@prisma/client';
 
 import { useAttributes } from '~/features/attributes/hooks';
-import { COLOR_ID } from '~/features/filtering/constants/url-query-keys';
+import { COLOR_ID } from '~/features/filters/constants/url-query-keys';
 import type { RouterOutputs } from '~/shared/utils/trpc';
 
 import { FilterRowHeader } from './filter-row-header';

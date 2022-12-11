@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { Box, Flex, Link, useColorModeValue } from '@chakra-ui/react';
 
 import { useCategories } from '~/features/categories/hooks';
-import { CATEGORY_ID } from '~/features/filtering/constants/url-query-keys';
+import { CATEGORY_ID } from '~/features/filters/constants/url-query-keys';
 import type { RouterOutputs } from '~/shared/utils/trpc';
 
 import { FilterRowHeader } from './filter-row-header';

@@ -5,7 +5,7 @@ import { Box, Flex, Link, useColorModeValue } from '@chakra-ui/react';
 import { AttributeType } from '@prisma/client';
 
 import { useAttributes } from '~/features/attributes/hooks';
-import { SIZE_ID } from '~/features/filtering/constants/url-query-keys';
+import { SIZE_ID } from '~/features/filters/constants/url-query-keys';
 import type { RouterOutputs } from '~/shared/utils/trpc';
 
 import { FilterRowHeader } from './filter-row-header';

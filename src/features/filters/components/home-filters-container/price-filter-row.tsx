@@ -16,7 +16,7 @@ import {
 import {
   MAX_PRICE,
   MIN_PRICE,
-} from '~/features/filtering/constants/url-query-keys';
+} from '~/features/filters/constants/url-query-keys';
 
 import { FilterRowHeader } from './filter-row-header';
 
