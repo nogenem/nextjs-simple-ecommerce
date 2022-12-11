@@ -1,1 +1,1 @@
-export * from './home-filters-container';
+export * from './product-card';
