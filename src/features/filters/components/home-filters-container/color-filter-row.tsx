@@ -7,7 +7,7 @@ import { Box, Flex, Icon, Tooltip, useColorModeValue } from '@chakra-ui/react';
 import { AttributeType } from '@prisma/client';
 
 import { useAttributes } from '~/features/attributes/hooks';
-import { COLOR_ID } from '~/features/filters/constants/url-query-keys';
+import { URL_QUERY_KEYS } from '~/features/filters/constants/url-query-keys';
 import type { RouterOutputs } from '~/shared/utils/trpc';
 
 import { FilterRowHeader } from './filter-row-header';
@@ -17,7 +17,10 @@ const ColorFilterRow = () => {
 
   return (
     <Flex w="100%" direction="column">
-      <FilterRowHeader label="Colors" queryParamKeys={[COLOR_ID]} />
+      <FilterRowHeader
+        label="Colors"
+        queryParamKeys={[URL_QUERY_KEYS.COLOR_ID]}
+      />
       {colors.isLoading && <Box>Loading...</Box>}
       {!!colors.data && (
         <Flex direction="row" gap="2">
@@ -43,14 +46,16 @@ const ColorFilterItem = ({
       <NextLink
         href={{
           pathname,
-          query: { ...query, [COLOR_ID]: color.id },
+          query: { ...query, [URL_QUERY_KEYS.COLOR_ID]: color.id },
         }}
       >
         <Icon
           boxSize="1.25rem"
           as={MdCircle}
           fill={color.value}
-          border={query[COLOR_ID] === color.id ? '1px solid' : ''}
+          border={
+            query[URL_QUERY_KEYS.COLOR_ID] === color.id ? '1px solid' : ''
+          }
           borderColor={activeBorderColor}
           borderRadius="50%"
         />

@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { Box, Flex, Link, useColorModeValue } from '@chakra-ui/react';
 
 import { useCategories } from '~/features/categories/hooks';
-import { CATEGORY_ID } from '~/features/filters/constants/url-query-keys';
+import { URL_QUERY_KEYS } from '~/features/filters/constants/url-query-keys';
 import type { RouterOutputs } from '~/shared/utils/trpc';
 
 import { FilterRowHeader } from './filter-row-header';
@@ -14,7 +14,10 @@ const CategoryFilterRow = () => {
 
   return (
     <Flex w="100%" direction="column">
-      <FilterRowHeader label="Categories" queryParamKeys={[CATEGORY_ID]} />
+      <FilterRowHeader
+        label="Categories"
+        queryParamKeys={[URL_QUERY_KEYS.CATEGORY_ID]}
+      />
       {categories.isLoading && <Box>Loading...</Box>}
       {!!categories.data && (
         <Flex direction="column" gap="2" maxH="250" overflowY="auto">
@@ -39,14 +42,20 @@ const CategoryFilterItem = ({
     <NextLink
       href={{
         pathname,
-        query: { ...query, [CATEGORY_ID]: category.id },
+        query: { ...query, [URL_QUERY_KEYS.CATEGORY_ID]: category.id },
       }}
       passHref
       legacyBehavior
     >
       <Link
-        textDecor={query[CATEGORY_ID] === category.id ? 'underline' : 'unset'}
-        color={query[CATEGORY_ID] === category.id ? activeColor : ''}
+        textDecor={
+          query[URL_QUERY_KEYS.CATEGORY_ID] === category.id
+            ? 'underline'
+            : 'unset'
+        }
+        color={
+          query[URL_QUERY_KEYS.CATEGORY_ID] === category.id ? activeColor : ''
+        }
       >
         {category.name}
       </Link>
