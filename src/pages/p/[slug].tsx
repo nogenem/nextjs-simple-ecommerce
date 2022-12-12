@@ -1,6 +1,6 @@
 import { Box } from '@chakra-ui/react';
 
-import { useFiltersSync } from '~/features/filters/hooks/use-filters-sync';
+import { useFiltersSync } from '~/features/filters/hooks';
 
 const Product = () => {
   useFiltersSync();

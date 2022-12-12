@@ -4,7 +4,7 @@ import Head from 'next/head';
 import { Box, Flex } from '@chakra-ui/react';
 
 import { HomeFiltersContainer } from '~/features/filters/components';
-import { useFiltersSync } from '~/features/filters/hooks/use-filters-sync';
+import { useFiltersSync } from '~/features/filters/hooks';
 import { ProductCard } from '~/features/products/components';
 import { useHomeProducts } from '~/features/products/hooks';
 
