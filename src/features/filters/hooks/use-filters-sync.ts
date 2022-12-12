@@ -6,7 +6,7 @@ import { useFiltersActions } from './use-filters-store';
 
 export const useFiltersSync = () => {
   const router = useRouter();
-  const { setFilters, updateFilters } = useFiltersActions();
+  const { setFilters } = useFiltersActions();
 
   useEffect(() => {
     if (router.isReady) {
@@ -21,12 +21,12 @@ export const useFiltersSync = () => {
       const searchParams = url.substring(url.indexOf('?'), url.length);
       const params = Object.fromEntries(new URLSearchParams(searchParams));
 
-      updateFilters(params);
+      setFilters(params);
     };
 
     router.events.on('routeChangeComplete', handleRouteChange);
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange);
     };
-  }, [router.events, updateFilters]);
+  }, [router.events, setFilters]);
 };
