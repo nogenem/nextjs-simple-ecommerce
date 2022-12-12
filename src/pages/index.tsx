@@ -4,11 +4,14 @@ import Head from 'next/head';
 import { Box, Flex } from '@chakra-ui/react';
 
 import { HomeFiltersContainer } from '~/features/filters/components';
+import { useFiltersSync } from '~/features/filters/hooks/use-filters-sync';
 import { ProductCard } from '~/features/products/components';
 import { useHomeProducts } from '~/features/products/hooks';
 
 const Home: NextPage = () => {
   const products = useHomeProducts();
+
+  useFiltersSync();
 
   return (
     <>
