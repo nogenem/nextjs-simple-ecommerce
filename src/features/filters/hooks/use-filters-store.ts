@@ -1,7 +1,10 @@
 import create from 'zustand';
 import { devtools } from 'zustand/middleware';
 
-import { URL_QUERY_KEYS } from '../constants/url-query-keys';
+import {
+  URL_QUERY_KEYS,
+  URL_QUERY_KEYS_SCHEME,
+} from '../constants/url-query-keys';
 
 type TFilters = Record<string, string | string[] | undefined>;
 
@@ -48,7 +51,11 @@ const getOnlyValidFilters = (filters: TFilters): TFilters => {
 
   const validFilters: TFilters = {};
   Object.entries(filters).forEach(([key, value]) => {
-    if (keysToTrueObj[key]) {
+    if (
+      keysToTrueObj[key] &&
+      !!URL_QUERY_KEYS_SCHEME[key] &&
+      URL_QUERY_KEYS_SCHEME[key]?.safeParse(value).success
+    ) {
       validFilters[key] = value;
     }
   });
