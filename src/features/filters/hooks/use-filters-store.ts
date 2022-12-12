@@ -1,3 +1,5 @@
+import type Router from 'next/router';
+
 import create from 'zustand';
 import { devtools } from 'zustand/middleware';
 
@@ -6,13 +8,14 @@ import {
   URL_QUERY_KEYS_SCHEME,
 } from '../constants/url-query-keys';
 
-type TFilters = Record<string, string | string[] | undefined>;
+type TRouterQuery = typeof Router.query;
+type TFilters = Record<string, string | string[]>;
 
 type TFiltersState = {
   filters: TFilters;
   actions: {
-    setFilters: (filters: TFilters) => void;
-    updateFilters: (filters: TFilters) => void;
+    setFilters: (filters: TRouterQuery) => void;
+    updateFilters: (filters: TRouterQuery) => void;
   };
 };
 
@@ -43,7 +46,7 @@ const useFiltersStore = create<TFiltersState>()(
   ),
 );
 
-const getOnlyValidFilters = (filters: TFilters): TFilters => {
+const getOnlyValidFilters = (filters: TRouterQuery): TFilters => {
   const keysToTrueObj = Object.values(URL_QUERY_KEYS).reduce((prev, curr) => {
     prev[curr] = true;
     return prev;
@@ -56,7 +59,7 @@ const getOnlyValidFilters = (filters: TFilters): TFilters => {
       !!URL_QUERY_KEYS_SCHEME[key] &&
       URL_QUERY_KEYS_SCHEME[key]?.safeParse(value).success
     ) {
-      validFilters[key] = value;
+      validFilters[key] = value || '';
     }
   });
 
