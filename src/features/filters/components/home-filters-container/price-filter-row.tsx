@@ -20,8 +20,12 @@ import { FilterRowHeader } from './filter-row-header';
 const PriceFilterRow = () => {
   const router = useRouter();
 
-  const [minPrice, setMinPrice] = useState<string>('');
-  const [maxPrice, setMaxPrice] = useState<string>('');
+  const [minPrice, setMinPrice] = useState<string>(
+    typeof router.query.min_price === 'string' ? router.query.min_price : '',
+  );
+  const [maxPrice, setMaxPrice] = useState<string>(
+    typeof router.query.max_price === 'string' ? router.query.max_price : '',
+  );
 
   const updateRouterQuery = (nextMinPrice: string, nextMaxPrice: string) => {
     const query: typeof router.query = {
