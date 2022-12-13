@@ -60,7 +60,7 @@ const PriceFilterRow = () => {
 
     setMinPrice(nextMinPrice);
 
-    if ((+nextMaxPrice || 0) < valueAsNumber + 1) {
+    if (nextMaxPrice !== '' && +nextMaxPrice < valueAsNumber + 1) {
       nextMaxPrice = `${valueAsNumber + 1}`;
 
       setMaxPrice(nextMaxPrice);
