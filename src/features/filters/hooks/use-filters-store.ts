@@ -71,6 +71,9 @@ const getOnlyValidFilters = (filters: TRouterQuery): TFilters => {
 
 export const useFilters = () => useFiltersStore((state) => state.filters);
 
+export const useFilterByKey = (key: string) =>
+  useFiltersStore((state) => state.filters[key]);
+
 export const useFiltersActions = () =>
   useFiltersStore((state) => state.actions);
 

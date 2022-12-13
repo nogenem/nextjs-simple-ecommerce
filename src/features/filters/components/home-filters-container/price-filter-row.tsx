@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { useRouter } from 'next/router';
 
 import {
@@ -14,18 +12,15 @@ import {
 } from '@chakra-ui/react';
 
 import { URL_QUERY_KEYS } from '~/features/filters/constants/url-query-keys';
+import { useFilterByKey } from '~/features/filters/hooks';
 
 import { FilterRowHeader } from './filter-row-header';
 
 const PriceFilterRow = () => {
   const router = useRouter();
 
-  const [minPrice, setMinPrice] = useState<string>(
-    typeof router.query.min_price === 'string' ? router.query.min_price : '',
-  );
-  const [maxPrice, setMaxPrice] = useState<string>(
-    typeof router.query.max_price === 'string' ? router.query.max_price : '',
-  );
+  const minPrice = useFilterByKey(URL_QUERY_KEYS.MIN_PRICE)?.toString() || '';
+  const maxPrice = useFilterByKey(URL_QUERY_KEYS.MAX_PRICE)?.toString() || '';
 
   const updateRouterQuery = (nextMinPrice: string, nextMaxPrice: string) => {
     const query: typeof router.query = {
@@ -58,12 +53,8 @@ const PriceFilterRow = () => {
     const nextMinPrice = Number.isNaN(valueAsNumber) ? '' : valueAsString;
     let nextMaxPrice = maxPrice;
 
-    setMinPrice(nextMinPrice);
-
     if (nextMaxPrice !== '' && +nextMaxPrice < valueAsNumber + 1) {
       nextMaxPrice = `${valueAsNumber + 1}`;
-
-      setMaxPrice(nextMaxPrice);
     }
 
     updateRouterQuery(nextMinPrice, nextMaxPrice);
@@ -74,8 +65,6 @@ const PriceFilterRow = () => {
     valueAsNumber: number,
   ) => {
     const nextMaxPrice = Number.isNaN(valueAsNumber) ? '' : valueAsString;
-
-    setMaxPrice(nextMaxPrice);
 
     updateRouterQuery(minPrice, nextMaxPrice);
   };
