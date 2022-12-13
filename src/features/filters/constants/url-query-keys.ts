@@ -8,7 +8,7 @@ export const URL_QUERY_KEYS = {
   SIZE_ID: 'size_id',
 };
 
-export const URL_QUERY_KEYS_SCHEME = {
+export const URL_QUERY_KEYS_VALIDATIONS = {
   [URL_QUERY_KEYS.CATEGORY_ID]: z.string(),
   [URL_QUERY_KEYS.MIN_PRICE]: z.union([
     z.coerce.number().gte(0),
@@ -21,3 +21,5 @@ export const URL_QUERY_KEYS_SCHEME = {
   [URL_QUERY_KEYS.COLOR_ID]: z.string(),
   [URL_QUERY_KEYS.SIZE_ID]: z.string(),
 };
+
+export const URL_QUERY_KEYS_SCHEME = z.object(URL_QUERY_KEYS_VALIDATIONS);
