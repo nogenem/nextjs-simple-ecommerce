@@ -15,7 +15,7 @@ export const URL_QUERY_KEYS_SCHEME = {
     z.string().length(0),
   ]),
   [URL_QUERY_KEYS.MAX_PRICE]: z.union([
-    z.coerce.number().gte(0),
+    z.coerce.number().gte(1),
     z.string().length(0),
   ]),
   [URL_QUERY_KEYS.COLOR_ID]: z.string(),
