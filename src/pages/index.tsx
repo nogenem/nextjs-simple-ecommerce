@@ -21,22 +21,20 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Flex direction={{ base: 'column', md: 'row' }} w="100%">
+        <HomeFiltersContainer />
         {products.isLoading && <Box w="100%">Loading...</Box>}
-        {products.isSuccess && (
-          <>
-            <HomeFiltersContainer />
-            <Flex
-              w="100%"
-              wrap="wrap"
-              grow="1"
-              justify={{ base: 'center', md: 'flex-start' }}
-              gap="3"
-            >
-              {products.data.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </Flex>
-          </>
+        {!!products.data && (
+          <Flex
+            w="100%"
+            wrap="wrap"
+            grow="1"
+            justify={{ base: 'center', md: 'flex-start' }}
+            gap="3"
+          >
+            {products.data.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </Flex>
         )}
       </Flex>
     </>
