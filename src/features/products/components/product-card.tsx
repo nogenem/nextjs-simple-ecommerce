@@ -29,6 +29,7 @@ const ProductCard = ({ product }: TProductCardProps) => {
   );
   const priceTextColor = useColorModeValue('blue.600', 'blue.200');
   const discountedPriceTextColor = useColorModeValue('gray.600', 'gray.300');
+  const soldOutTextColor = useColorModeValue('red.600', 'red.300');
 
   const variant = product.variants[0];
 
@@ -47,6 +48,30 @@ const ProductCard = ({ product }: TProductCardProps) => {
     variant.currency_code,
     product.discount?.percent,
   );
+
+  let priceText = (
+    <>
+      <Text color={priceTextColor} fontSize="2xl">
+        {priceWithDiscount}
+      </Text>
+      {priceWithoutDiscount !== priceWithDiscount && (
+        <Text
+          color={discountedPriceTextColor}
+          fontSize="m"
+          textDecor="line-through"
+        >
+          {priceWithoutDiscount}
+        </Text>
+      )}
+    </>
+  );
+  if (variant.quantity_in_stock === 0) {
+    priceText = (
+      <Text color={soldOutTextColor} fontSize="2xl">
+        Sold out
+      </Text>
+    );
+  }
 
   return (
     <NextLink href={`/p/${product.slug}`} passHref legacyBehavior>
@@ -83,18 +108,7 @@ const ProductCard = ({ product }: TProductCardProps) => {
             <Stack mt="6" spacing="3">
               <Heading size="md">{product.name}</Heading>
               <Flex gap="2" align="center">
-                <Text color={priceTextColor} fontSize="2xl">
-                  {priceWithDiscount}
-                </Text>
-                {priceWithoutDiscount !== priceWithDiscount && (
-                  <Text
-                    color={discountedPriceTextColor}
-                    fontSize="m"
-                    textDecor="line-through"
-                  >
-                    {priceWithoutDiscount}
-                  </Text>
-                )}
+                {priceText}
               </Flex>
             </Stack>
           </CardBody>
