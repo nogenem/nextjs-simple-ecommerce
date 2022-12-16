@@ -93,6 +93,10 @@ const getHomeProducts = async (
   const discountedPriceClause = Prisma.sql`
   v.price / 100 * (1 - IFNULL(d.percent, 0) / 100 / 100)
   `;
+  // If out of stock, then i want it showing up at the bottom, hence the multiplication by 10
+  const discountedPriceWithStockClause = Prisma.sql`
+  IF(v.quantity_in_stock > 0, 1, 10) * v.price / 100 * (1 - IFNULL(d.percent, 0) / 100 / 100)
+  `;
 
   // Find the products
   const productsResults: (Product & { minDiscountedPrice: number })[] =
@@ -106,7 +110,7 @@ const getHomeProducts = async (
     p.updated_at,
     p.categoryId,
     p.discountId,
-    MIN(${discountedPriceClause}) minDiscountedPrice
+    MIN(${discountedPriceWithStockClause}) minDiscountedPrice
   FROM
     Product p
     INNER JOIN Variant v ON v.productId = p.id
@@ -126,8 +130,7 @@ const getHomeProducts = async (
     ${discountedPriceClause} >= ${minPrice} AND
     ${discountedPriceClause} <= ${maxPrice}
   GROUP BY p.id
-  ORDER BY
-    minDiscountedPrice ASC`;
+  ORDER BY minDiscountedPrice ASC`;
 
   if (productsResults.length === 0) {
     return [] as THomeProduct[];
@@ -164,7 +167,7 @@ const getHomeProducts = async (
     (Variant & { discountedPrice: number })[]
   > = ctx.prisma.$queryRaw`SELECT
     v.*,
-    ${discountedPriceClause} discountedPrice
+    ${discountedPriceWithStockClause} discountedPrice
   FROM
     Variant v
     INNER JOIN Product p ON p.id = v.productId
@@ -180,10 +183,9 @@ const getHomeProducts = async (
     v.available_for_sale = TRUE AND
     ${a1ColorClause} AND
     ${a2SizeClause} AND
-    v.productId IN (${Prisma.join(productsIds)})
-  HAVING
-    discountedPrice >= ${minPrice} AND
-    discountedPrice <= ${maxPrice}
+    v.productId IN (${Prisma.join(productsIds)}) AND
+    ${discountedPriceClause} >= ${minPrice} AND
+    ${discountedPriceClause} <= ${maxPrice}
   ORDER BY discountedPrice ASC
   `;
 
