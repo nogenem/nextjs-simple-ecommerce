@@ -8,6 +8,7 @@ import type {
   VariantImage,
 } from '@prisma/client';
 import { AttributeType, Prisma } from '@prisma/client';
+import { z } from 'zod';
 
 import { type Context } from '~/server/trpc/context';
 import { publicProcedure, router } from '~/server/trpc/trpc';
@@ -54,6 +55,33 @@ export const productsRouter = router({
         sizeId,
       });
     }),
+  bySlug: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
+    const product = await ctx.prisma.product.findFirst({
+      include: {
+        variants: {
+          include: {
+            attributes: true,
+            images: true,
+          },
+        },
+        category: true,
+        discount: true,
+      },
+      where: {
+        slug: input,
+      },
+    });
+
+    if (
+      product &&
+      product.discount &&
+      product.discount.valid_until <= new Date()
+    ) {
+      product.discount = null;
+    }
+
+    return product;
+  }),
 });
 
 const getHomeProducts = async (
