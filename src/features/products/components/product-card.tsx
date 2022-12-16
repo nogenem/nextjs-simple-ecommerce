@@ -49,6 +49,10 @@ const ProductCard = ({ product }: TProductCardProps) => {
     product.discount?.percent,
   );
 
+  const query = variant.attributes
+    .map((attr) => `${attr.type.toLowerCase()}_id=${attr.id}`)
+    .join('&');
+
   let priceText = (
     <>
       <Text color={priceTextColor} fontSize="2xl">
@@ -74,7 +78,7 @@ const ProductCard = ({ product }: TProductCardProps) => {
   }
 
   return (
-    <NextLink href={`/p/${product.slug}`} passHref legacyBehavior>
+    <NextLink href={`/p/${product.slug}?${query}`} passHref legacyBehavior>
       <Link textDecoration="none !important" target="_blank">
         <Card
           maxW="300"
