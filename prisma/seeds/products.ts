@@ -1,10 +1,4 @@
-import type {
-  Attribute,
-  Category,
-  Prisma,
-  PrismaClient,
-  VariantImage,
-} from '@prisma/client';
+import type { Attribute, Category, Prisma, PrismaClient } from '@prisma/client';
 import { AttributeType } from '@prisma/client';
 
 import { getRandomArbitrary } from '../utils';
@@ -101,15 +95,6 @@ async function createProduct(
     );
   }
 
-  // images
-  console.log(`>> Creating product ${prodIdx}' images...`);
-  const imagesPromises: Promise<VariantImage>[] = PRODUCT.images.map((img) =>
-    prisma.variantImage.create({
-      data: img,
-    }),
-  );
-  const imagesIds = (await Promise.all(imagesPromises)).map((img) => img.id);
-
   // discount
   let discountId: string | undefined = undefined;
   if (PRODUCT.discount) {
@@ -126,6 +111,10 @@ async function createProduct(
 
   PRODUCT.sizes.forEach((size, i) => {
     PRODUCT.colors.forEach((color, j) => {
+      const image = PRODUCT.images[
+        j
+      ] as Prisma.VariantImageCreateWithoutVariantInput;
+
       variants.push({
         price: getRandomArbitrary(1000, 2000),
         sku: `p${prodIdx}-variant-${i}-${j}`,
@@ -135,11 +124,7 @@ async function createProduct(
           connect: [{ id: attributesObj[size] }, { id: attributesObj[color] }],
         },
         images: {
-          connect: [
-            { id: imagesIds[j] },
-            { id: imagesIds[j] },
-            { id: imagesIds[j] },
-          ],
+          create: [image, image, image],
         },
       });
     });
