@@ -1,0 +1,5 @@
+/* Fix for strange defaults from Chakra UI */
+.user-content-wrapper ul {
+  margin-inline-start: 1em;
+  list-style-type: initial;
+}
