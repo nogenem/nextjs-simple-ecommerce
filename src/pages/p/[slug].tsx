@@ -27,6 +27,7 @@ import {
 import type { Attribute, VariantImage } from '@prisma/client';
 import { AttributeType } from '@prisma/client';
 
+import { useAddItemToCart } from '~/features/cart/hooks';
 import { URL_QUERY_KEYS } from '~/features/filters/constants/url-query-keys';
 import { useFilters, useFiltersSync } from '~/features/filters/hooks';
 import { useProductBySlug } from '~/features/products/hooks';
@@ -45,6 +46,7 @@ const Product = () => {
   const filters = useFilters();
   const product = useProductBySlug(router.query.slug as string);
   const variant = useProductVariantByFilters(product.data);
+  const addItemToCart = useAddItemToCart();
   const [imageIdx, setImageIdx] = useState(0);
   const [quantityToAdd, setQuantityToAdd] = useState(1);
 
@@ -139,6 +141,11 @@ const Product = () => {
     }
   };
 
+  const handleAddToCartClick = () => {
+    addItemToCart.mutate({ variantId: variant.id, quantity: quantityToAdd });
+    setQuantityToAdd(1);
+  };
+
   return (
     <Flex w="100%" alignItems="center" justifyContent="center">
       <Flex
@@ -229,6 +236,8 @@ const Product = () => {
           <Button
             rightIcon={<MdOutlineAddShoppingCart />}
             colorScheme="primary"
+            onClick={handleAddToCartClick}
+            isLoading={addItemToCart.isLoading}
           >
             Add to cart
           </Button>
