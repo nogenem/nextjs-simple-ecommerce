@@ -11,5 +11,9 @@ export const getServerAuthSession = async (ctx: {
   req: GetServerSidePropsContext['req'];
   res: GetServerSidePropsContext['res'];
 }) => {
-  return await unstable_getServerSession(ctx.req, ctx.res, authOptions);
+  return await unstable_getServerSession(
+    ctx.req,
+    ctx.res,
+    authOptions(ctx.req, ctx.res),
+  );
 };

@@ -1,15 +1,12 @@
-import type { Cart, CartItem } from '@prisma/client';
+import type { CartItem } from '@prisma/client';
 import nookies from 'nookies';
 import { z } from 'zod';
 
 import type { Context } from '~/server/trpc/context';
 import { publicProcedure, router } from '~/server/trpc/trpc';
 import { TEMP_CART_COOKIE_KEY } from '~/shared/constants/cookie-keys';
+import type { CartWithItems } from '~/shared/types/globals';
 import type { RouterInputs } from '~/shared/utils/trpc';
-
-type CartWithItems = Cart & {
-  items: CartItem[];
-};
 
 export const cartRouter = router({
   addItem: publicProcedure
