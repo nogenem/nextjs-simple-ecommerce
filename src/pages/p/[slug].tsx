@@ -13,6 +13,7 @@ import {
   CircularProgress,
   Flex,
   FormControl,
+  FormHelperText,
   FormLabel,
   Heading,
   NumberDecrementStepper,
@@ -27,7 +28,10 @@ import {
 import type { Attribute, VariantImage } from '@prisma/client';
 import { AttributeType } from '@prisma/client';
 
-import { useAddItemToCart } from '~/features/cart/hooks';
+import {
+  useAddItemToCart,
+  useCountCartItemsByProductId,
+} from '~/features/cart/hooks';
 import { URL_QUERY_KEYS } from '~/features/filters/constants/url-query-keys';
 import { useFilters, useFiltersSync } from '~/features/filters/hooks';
 import { useProductBySlug } from '~/features/products/hooks';
@@ -46,6 +50,7 @@ const Product = () => {
   const filters = useFilters();
   const product = useProductBySlug(router.query.slug as string);
   const variant = useProductVariantByFilters(product.data);
+  const countItemsByProductId = useCountCartItemsByProductId(product.data?.id);
   const addItemToCart = useAddItemToCart();
   const [imageIdx, setImageIdx] = useState(0);
   const [quantityToAdd, setQuantityToAdd] = useState(1);
@@ -146,6 +151,14 @@ const Product = () => {
     setQuantityToAdd(1);
   };
 
+  const countItemsByProductIdValue = countItemsByProductId.data || 0;
+  const nVariantsInCartMessage =
+    countItemsByProductIdValue > 0
+      ? countItemsByProductIdValue === 1
+        ? `There is already 1 variant in the cart`
+        : `There are already ${countItemsByProductIdValue} variants in the cart`
+      : '';
+
   return (
     <Flex w="100%" alignItems="center" justifyContent="center">
       <Flex
@@ -233,14 +246,18 @@ const Product = () => {
             </NumberInput>
           </FormControl>
 
-          <Button
-            rightIcon={<MdOutlineAddShoppingCart />}
-            colorScheme="primary"
-            onClick={handleAddToCartClick}
-            isLoading={addItemToCart.isLoading}
-          >
-            Add to cart
-          </Button>
+          <FormControl w="100%">
+            <Button
+              rightIcon={<MdOutlineAddShoppingCart />}
+              colorScheme="primary"
+              onClick={handleAddToCartClick}
+              isLoading={addItemToCart.isLoading}
+              w="100%"
+            >
+              Add to cart
+            </Button>
+            <FormHelperText>{nVariantsInCartMessage}</FormHelperText>
+          </FormControl>
         </Flex>
       </Flex>
     </Flex>

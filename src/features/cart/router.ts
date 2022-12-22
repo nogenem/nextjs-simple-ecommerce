@@ -46,10 +46,7 @@ export const cartRouter = router({
       return sum._sum.quantity;
     } else {
       // guest user
-      const cookies = nookies.get(ctx);
-      const cart = JSON.parse(
-        cookies[TEMP_CART_COOKIE_KEY] || '{}',
-      ) as CartWithItems;
+      const cart = getTempCart(ctx);
 
       if (!cart.id) {
         return 0;
@@ -58,7 +55,66 @@ export const cartRouter = router({
       return cart.items.reduce((prev, curr) => prev + curr.quantity, 0);
     }
   }),
+  countItemsByProductId: publicProcedure
+    .input(
+      z
+        .object({
+          productId: z.string().optional(),
+        })
+        .optional(),
+    )
+    .query(async ({ input, ctx }) => {
+      const productId = input?.productId;
+
+      if (!productId) return 0;
+
+      const user = ctx.session?.user;
+      if (user) {
+        // logged in user
+        const count = await ctx.prisma.cartItem.aggregate({
+          _count: {
+            id: true,
+          },
+          where: {
+            variant: {
+              productId,
+            },
+          },
+        });
+
+        return count._count.id;
+      } else {
+        // guest user
+        const cart = getTempCart(ctx);
+
+        if (!cart.id) return 0;
+
+        const variantsIds = cart.items.map((item) => item.variantId);
+
+        const count = await ctx.prisma.cartItem.aggregate({
+          _count: {
+            id: true,
+          },
+          where: {
+            variant: {
+              id: {
+                in: variantsIds,
+              },
+              productId,
+            },
+          },
+        });
+
+        return count._count.id;
+      }
+    }),
 });
+
+const getTempCart = (ctx: Context) => {
+  const cookies = nookies.get(ctx);
+
+  return JSON.parse(cookies[TEMP_CART_COOKIE_KEY] || '{}') as CartWithItems;
+};
 
 const addItemToLoggedInUserCart = async (
   userId: string,
@@ -104,9 +160,7 @@ const addItemToGuestUserCart = (
   const NOW = new Date();
   let BASE_ID = NOW.getTime();
 
-  const cookies = nookies.get(ctx);
-
-  let cart = JSON.parse(cookies[TEMP_CART_COOKIE_KEY] || '{}') as CartWithItems;
+  let cart = getTempCart(ctx);
   if (!cart.id) {
     cart = {
       id: `${BASE_ID++}`,
