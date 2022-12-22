@@ -1,5 +1,9 @@
 import { trpc } from '~/shared/utils/trpc';
 
 export const useSumCartItemsQuantities = () => {
-  return trpc.cart.sumItemsQuantities.useQuery();
+  const query = trpc.cart.sumItemsQuantities.useQuery();
+
+  return {
+    sum: query.data || 0,
+  };
 };

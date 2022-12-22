@@ -9,7 +9,7 @@ import { ProductCard } from '~/features/products/components';
 import { useHomeProducts } from '~/features/products/hooks';
 
 const Home: NextPage = () => {
-  const products = useHomeProducts();
+  const { products, isLoading } = useHomeProducts();
 
   useFiltersSync();
 
@@ -22,8 +22,8 @@ const Home: NextPage = () => {
       </Head>
       <Flex direction={{ base: 'column', md: 'row' }} w="100%">
         <HomeFiltersContainer />
-        {products.isLoading && <Box w="100%">Loading...</Box>}
-        {!!products.data && (
+        {isLoading && <Box w="100%">Loading...</Box>}
+        {!isLoading && (
           <Flex
             w="100%"
             wrap="wrap"
@@ -31,7 +31,7 @@ const Home: NextPage = () => {
             justify={{ base: 'center', md: 'flex-start' }}
             gap="3"
           >
-            {products.data.map((product) => (
+            {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </Flex>

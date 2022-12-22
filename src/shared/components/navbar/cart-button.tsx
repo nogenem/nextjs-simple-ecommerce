@@ -9,12 +9,11 @@ import { useSumCartItemsQuantities } from '~/features/cart/hooks';
 import { NavbarIconButton } from './navbar-icon-button';
 
 const CartButton = () => {
-  const sumCartItemsQuantities = useSumCartItemsQuantities();
+  const { sum: sumCartItemsQuantities } = useSumCartItemsQuantities();
 
-  const sumCartItemsQuantitiesValue = sumCartItemsQuantities.data || 0;
   const variantsInCartTxt =
-    sumCartItemsQuantitiesValue > 99 ? '99+' : `${sumCartItemsQuantitiesValue}`;
-  const badgeFontSize = sumCartItemsQuantitiesValue > 99 ? 9 : 11;
+    sumCartItemsQuantities > 99 ? '99+' : `${sumCartItemsQuantities}`;
+  const badgeFontSize = sumCartItemsQuantities > 99 ? 9 : 11;
 
   return (
     <NextLink href="/cart" passHref legacyBehavior>
@@ -28,7 +27,7 @@ const CartButton = () => {
           aria-label="Go to the Cart page"
           tabIndex={-1}
         />
-        {sumCartItemsQuantitiesValue > 0 && (
+        {sumCartItemsQuantities > 0 && (
           <Badge
             colorScheme="secondary"
             sx={{

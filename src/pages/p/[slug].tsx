@@ -48,26 +48,31 @@ const Product = () => {
 
   const router = useRouter();
   const filters = useFilters();
-  const product = useProductBySlug(router.query.slug as string);
-  const variant = useProductVariantByFilters(product.data);
-  const countItemsByProductId = useCountCartItemsByProductId(product.data?.id);
-  const addItemToCart = useAddItemToCart();
+  const { product, isLoading: isProductInfoLoading } = useProductBySlug(
+    router.query.slug as string,
+  );
+  const variant = useProductVariantByFilters(product);
+  const { count: countCartItemsByProductId } = useCountCartItemsByProductId(
+    product?.id,
+  );
+  const { mutate: addItemToCart, isLoading: isAddingItemToCart } =
+    useAddItemToCart();
   const [imageIdx, setImageIdx] = useState(0);
   const [quantityToAdd, setQuantityToAdd] = useState(1);
 
   const sizes = useMemo(() => {
-    return getProductAttributesByType(AttributeType.Size, product.data);
-  }, [product.data]);
+    return getProductAttributesByType(AttributeType.Size, product);
+  }, [product]);
   const colors = useMemo(() => {
-    return getProductAttributesByType(AttributeType.Color, product.data);
-  }, [product.data]);
+    return getProductAttributesByType(AttributeType.Color, product);
+  }, [product]);
 
   const cardBorderColor = useColorModeValue('gray.300', 'gray.600');
   const priceTextColor = useColorModeValue('blue.600', 'blue.200');
   const discountedPriceTextColor = useColorModeValue('gray.600', 'gray.300');
   const soldOutTextColor = useColorModeValue('red.600', 'red.300');
 
-  if (product.isLoading || variant === undefined) {
+  if (isProductInfoLoading || variant === undefined) {
     return (
       <Flex w="100%" alignItems="center" justifyContent="center">
         <CircularProgress isIndeterminate color="primary.300" />
@@ -75,7 +80,7 @@ const Product = () => {
     );
   }
 
-  if (!product.data || variant === null) {
+  if (!product || variant === null) {
     return (
       <Flex w="100%" alignItems="center" justifyContent="center">
         <Alert status="error">
@@ -99,7 +104,7 @@ const Product = () => {
   const priceWithDiscount = formatPrice(
     variant.price,
     variant.currency_code,
-    product.data.discount?.percent,
+    product.discount?.percent,
   );
 
   let priceText = (
@@ -147,16 +152,15 @@ const Product = () => {
   };
 
   const handleAddToCartClick = () => {
-    addItemToCart.mutate({ variantId: variant.id, quantity: quantityToAdd });
+    addItemToCart({ variantId: variant.id, quantity: quantityToAdd });
     setQuantityToAdd(1);
   };
 
-  const countItemsByProductIdValue = countItemsByProductId.data || 0;
   const nVariantsInCartMessage =
-    countItemsByProductIdValue > 0
-      ? countItemsByProductIdValue === 1
+    countCartItemsByProductId > 0
+      ? countCartItemsByProductId === 1
         ? `There is already 1 variant in the cart`
-        : `There are already ${countItemsByProductIdValue} variants in the cart`
+        : `There are already ${countCartItemsByProductId} variants in the cart`
       : '';
 
   return (
@@ -197,10 +201,10 @@ const Product = () => {
           </CardBody>
         </Card>
         <Flex w="100%" maxW="450" flexDir="column" gap="3">
-          <Heading>{product.data.name}</Heading>
+          <Heading>{product.name}</Heading>
           <Box
             className="user-content-wrapper"
-            dangerouslySetInnerHTML={{ __html: product.data.description_html }}
+            dangerouslySetInnerHTML={{ __html: product.description_html }}
           />
           <Flex alignItems="center" gap="2">
             {priceText}
@@ -251,7 +255,7 @@ const Product = () => {
               rightIcon={<MdOutlineAddShoppingCart />}
               colorScheme="primary"
               onClick={handleAddToCartClick}
-              isLoading={addItemToCart.isLoading}
+              isLoading={isAddingItemToCart}
               w="100%"
             >
               Add to cart

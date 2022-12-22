@@ -6,7 +6,7 @@ export const useAddItemToCart = () => {
   const toast = useToast();
   const utils = trpc.useContext();
 
-  return trpc.cart.addItem.useMutation({
+  const mutation = trpc.cart.addItem.useMutation({
     onSuccess: () => {
       utils.cart.invalidate();
 
@@ -27,4 +27,9 @@ export const useAddItemToCart = () => {
       });
     },
   });
+
+  return {
+    mutate: mutation.mutate,
+    isLoading: mutation.isLoading,
+  };
 };

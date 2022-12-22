@@ -1,5 +1,11 @@
+import type { RouterOutputs } from '~/shared/utils/trpc';
 import { trpc } from '~/shared/utils/trpc';
 
 export const useCategories = () => {
-  return trpc.categories.all.useQuery();
+  const query = trpc.categories.all.useQuery();
+
+  return {
+    categories: query.data || ([] as RouterOutputs['categories']['all']),
+    isLoading: query.isLoading,
+  };
 };
