@@ -47,10 +47,12 @@ const Product = () => {
   useFiltersSync();
 
   const router = useRouter();
+  const slug = Array.isArray(router.query.slug)
+    ? router.query.slug[0]
+    : router.query.slug;
+
   const filters = useFilters();
-  const { product, isLoading: isProductInfoLoading } = useProductBySlug(
-    router.query.slug as string,
-  );
+  const { product, isLoading: isProductInfoLoading } = useProductBySlug(slug);
   const variant = useProductVariantByFilters(product);
   const { count: countCartItemsByProductId } = useCountCartItemsByProductId(
     product?.id,
