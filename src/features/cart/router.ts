@@ -4,7 +4,10 @@ import { z } from 'zod';
 
 import type { Context } from '~/server/trpc/context';
 import { publicProcedure, router } from '~/server/trpc/trpc';
-import { TEMP_CART_COOKIE_KEY } from '~/shared/constants/cookie-keys';
+import {
+  TEMP_CART_COOKIE_DATA,
+  TEMP_CART_COOKIE_KEY,
+} from '~/shared/constants/cookies';
 import type { CartWithItems } from '~/shared/types/globals';
 import type { RouterInputs } from '~/shared/utils/trpc';
 
@@ -105,12 +108,12 @@ const addItemToGuestUserCart = (
     cart.items.push(cartItem);
   }
 
-  nookies.set(ctx, TEMP_CART_COOKIE_KEY, JSON.stringify(cart), {
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    path: '/',
-  });
+  nookies.set(
+    ctx,
+    TEMP_CART_COOKIE_KEY,
+    JSON.stringify(cart),
+    TEMP_CART_COOKIE_DATA,
+  );
 
   return cartItem;
 };

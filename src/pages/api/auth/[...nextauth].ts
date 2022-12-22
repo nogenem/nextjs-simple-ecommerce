@@ -14,7 +14,10 @@ import nookies from 'nookies';
 import { env } from '~/env/server.mjs';
 import { saveOrMergeTempCart } from '~/features/cart/utils/save-or-merge-temp-cart';
 import { prisma } from '~/server/db/client';
-import { TEMP_CART_COOKIE_KEY } from '~/shared/constants/cookie-keys';
+import {
+  TEMP_CART_COOKIE_DATA,
+  TEMP_CART_COOKIE_KEY,
+} from '~/shared/constants/cookies';
 import type { CartWithItems } from '~/shared/types/globals';
 
 export const authOptions = (
@@ -58,12 +61,12 @@ export const authOptions = (
       });
 
       if (!!cart) {
-        nookies.set({ res }, TEMP_CART_COOKIE_KEY, JSON.stringify(cart), {
-          maxAge: 30 * 24 * 60 * 60, // 30 days
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          path: '/',
-        });
+        nookies.set(
+          { res },
+          TEMP_CART_COOKIE_KEY,
+          JSON.stringify(cart),
+          TEMP_CART_COOKIE_DATA,
+        );
       }
     },
   },
