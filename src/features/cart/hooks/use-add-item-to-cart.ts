@@ -4,9 +4,12 @@ import { trpc } from '~/shared/utils/trpc';
 
 export const useAddItemToCart = () => {
   const toast = useToast();
+  const utils = trpc.useContext();
 
   return trpc.cart.addItem.useMutation({
     onSuccess: () => {
+      utils.cart.invalidate();
+
       toast({
         title: 'Product added to the cart!',
         status: 'success',
