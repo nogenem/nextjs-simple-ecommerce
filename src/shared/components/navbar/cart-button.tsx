@@ -4,13 +4,17 @@ import NextLink from 'next/link';
 
 import { Badge, Icon, Link } from '@chakra-ui/react';
 
+import { useSumCartQuantities } from '~/features/cart/hooks';
+
 import { NavbarIconButton } from './navbar-icon-button';
 
 const CartButton = () => {
-  // TODO: Get data from the real cart
-  const productsInCart = 10;
-  const productsInCartTxt = productsInCart > 99 ? '99+' : `${productsInCart}`;
-  const badgeFontSize = productsInCart > 99 ? 9 : 11;
+  const variantsInCart = useSumCartQuantities();
+
+  const variantsInCartValue = variantsInCart.data || 0;
+  const variantsInCartTxt =
+    variantsInCartValue > 99 ? '99+' : `${variantsInCartValue}`;
+  const badgeFontSize = variantsInCartValue > 99 ? 9 : 11;
 
   return (
     <NextLink href="/cart" passHref legacyBehavior>
@@ -24,19 +28,21 @@ const CartButton = () => {
           aria-label="Go to the Cart page"
           tabIndex={-1}
         />
-        <Badge
-          colorScheme="secondary"
-          sx={{
-            position: 'absolute',
-            top: 0,
-            right: '-6px',
-            pointerEvents: 'none',
-          }}
-          rounded="full"
-          fontSize={badgeFontSize}
-        >
-          {productsInCartTxt}
-        </Badge>
+        {variantsInCartValue > 0 && (
+          <Badge
+            colorScheme="secondary"
+            sx={{
+              position: 'absolute',
+              top: 0,
+              right: '-6px',
+              pointerEvents: 'none',
+            }}
+            rounded="full"
+            fontSize={badgeFontSize}
+          >
+            {variantsInCartTxt}
+          </Badge>
+        )}
       </Link>
     </NextLink>
   );

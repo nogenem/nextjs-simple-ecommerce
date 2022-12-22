@@ -29,6 +29,35 @@ export const cartRouter = router({
         return addItemToGuestUserCart(input, ctx);
       }
     }),
+  sumQuantities: publicProcedure.query(async ({ ctx }) => {
+    const user = ctx.session?.user;
+    if (user) {
+      // logged in user
+      const sum = await ctx.prisma.cartItem.aggregate({
+        _sum: {
+          quantity: true,
+        },
+        where: {
+          cart: {
+            userId: user.id,
+          },
+        },
+      });
+      return sum._sum.quantity;
+    } else {
+      // guest user
+      const cookies = nookies.get(ctx);
+      const cart = JSON.parse(
+        cookies[TEMP_CART_COOKIE_KEY] || '{}',
+      ) as CartWithItems;
+
+      if (!cart.id) {
+        return 0;
+      }
+
+      return cart.items.reduce((prev, curr) => prev + curr.quantity, 0);
+    }
+  }),
 });
 
 const addItemToLoggedInUserCart = async (
