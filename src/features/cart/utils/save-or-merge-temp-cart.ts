@@ -48,6 +48,7 @@ export const saveOrMergeTempCart = async (
       if (dbItem.quantity !== item.quantity) {
         dbItem.quantity = item.quantity;
       }
+      delete variantIdToCartItemObj[item.variantId];
     } else {
       tempCartItemsToSave.push({
         quantity: item.quantity,
@@ -56,6 +57,9 @@ export const saveOrMergeTempCart = async (
       });
     }
   });
+
+  // Delete all that weren't found in the temp cart
+  const dbCartItemsToDelete = Object.values(variantIdToCartItemObj);
 
   const promises = [
     ...dbCartItemsToUpdate.map((item) =>
@@ -77,6 +81,13 @@ export const saveOrMergeTempCart = async (
         },
       }),
     ),
+    prisma.cartItem.deleteMany({
+      where: {
+        id: {
+          in: dbCartItemsToDelete.map((item) => item.id),
+        },
+      },
+    }),
   ];
 
   await Promise.all(promises);
