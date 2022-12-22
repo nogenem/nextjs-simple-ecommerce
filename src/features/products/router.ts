@@ -55,33 +55,39 @@ export const productsRouter = router({
         sizeId,
       });
     }),
-  bySlug: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
-    const product = await ctx.prisma.product.findFirst({
-      include: {
-        variants: {
-          include: {
-            attributes: true,
-            images: true,
+  bySlug: publicProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const product = await ctx.prisma.product.findFirst({
+        include: {
+          variants: {
+            include: {
+              attributes: true,
+              images: true,
+            },
           },
+          category: true,
+          discount: true,
         },
-        category: true,
-        discount: true,
-      },
-      where: {
-        slug: input,
-      },
-    });
+        where: {
+          slug: input.slug,
+        },
+      });
 
-    if (
-      product &&
-      product.discount &&
-      product.discount.valid_until <= new Date()
-    ) {
-      product.discount = null;
-    }
+      if (
+        product &&
+        product.discount &&
+        product.discount.valid_until <= new Date()
+      ) {
+        product.discount = null;
+      }
 
-    return product;
-  }),
+      return product;
+    }),
 });
 
 const getHomeProducts = async (

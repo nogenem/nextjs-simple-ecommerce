@@ -57,17 +57,11 @@ export const cartRouter = router({
   }),
   countItemsByProductId: publicProcedure
     .input(
-      z
-        .object({
-          productId: z.string().optional(),
-        })
-        .optional(),
+      z.object({
+        productId: z.string(),
+      }),
     )
     .query(async ({ input, ctx }) => {
-      const productId = input?.productId;
-
-      if (!productId) return 0;
-
       const user = ctx.session?.user;
       if (user) {
         // logged in user
@@ -77,7 +71,7 @@ export const cartRouter = router({
           },
           where: {
             variant: {
-              productId,
+              productId: input.productId,
             },
           },
         });
@@ -100,7 +94,7 @@ export const cartRouter = router({
               id: {
                 in: variantsIds,
               },
-              productId,
+              productId: input.productId,
             },
           },
         });

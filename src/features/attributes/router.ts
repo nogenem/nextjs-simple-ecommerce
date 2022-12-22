@@ -6,11 +6,9 @@ import { publicProcedure, router } from '~/server/trpc/trpc';
 export const attributesRouter = router({
   all: publicProcedure
     .input(
-      z
-        .object({
-          type: z.nativeEnum(AttributeType).optional(),
-        })
-        .optional(),
+      z.object({
+        type: z.nativeEnum(AttributeType).optional(),
+      }),
     )
     .query(async ({ input, ctx }) => {
       return ctx.prisma.attribute.findMany({
@@ -22,7 +20,7 @@ export const attributesRouter = router({
         },
         orderBy: [{ type: 'asc' }, { name: 'asc' }],
         where: {
-          type: input?.type,
+          type: input.type,
         },
       });
     }),
