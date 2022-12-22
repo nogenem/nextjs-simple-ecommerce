@@ -23,7 +23,7 @@ const Home: NextPage = () => {
       <Flex direction={{ base: 'column', md: 'row' }} w="100%">
         <HomeFiltersContainer />
         {isLoading && <Box w="100%">Loading...</Box>}
-        {!isLoading && (
+        {!!products.length && (
           <Flex
             w="100%"
             wrap="wrap"

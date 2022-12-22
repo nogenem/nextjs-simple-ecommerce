@@ -119,11 +119,11 @@ const getHomeProducts = async (
     ? Prisma.sql`(a2.type = ${AttributeType.Size} AND a2.id = ${sizeId})`
     : Prisma.sql`(a2.type = ${AttributeType.Size} AND a2.id IS NOT NULL)`;
   const discountedPriceClause = Prisma.sql`
-  v.price / 100 * (1 - IFNULL(d.percent, 0) / 100 / 100)
+  v.price * (1 - IFNULL(d.percent, 0) / 100 / 100)
   `;
   // If out of stock, then i want it showing up at the bottom, hence the multiplication by 10
   const discountedPriceWithStockClause = Prisma.sql`
-  IF(v.quantity_in_stock > 0, 1, 10) * v.price / 100 * (1 - IFNULL(d.percent, 0) / 100 / 100)
+  IF(v.quantity_in_stock > 0, 1, 10) * v.price * (1 - IFNULL(d.percent, 0) / 100 / 100)
   `;
 
   // Find the products
@@ -158,7 +158,7 @@ const getHomeProducts = async (
     ${discountedPriceClause} >= ${minPrice} AND
     ${discountedPriceClause} <= ${maxPrice}
   GROUP BY p.id
-  ORDER BY minDiscountedPrice ASC`;
+  ORDER BY minDiscountedPrice ASC, p.name ASC`;
 
   if (productsResults.length === 0) {
     return [] as THomeProduct[];
@@ -214,7 +214,7 @@ const getHomeProducts = async (
     v.productId IN (${Prisma.join(productsIds)}) AND
     ${discountedPriceClause} >= ${minPrice} AND
     ${discountedPriceClause} <= ${maxPrice}
-  ORDER BY discountedPrice ASC
+  ORDER BY discountedPrice ASC, p.name ASC
   `;
 
   // Find the categories, discounts and variants
