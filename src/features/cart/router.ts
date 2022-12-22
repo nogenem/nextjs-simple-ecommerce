@@ -29,7 +29,7 @@ export const cartRouter = router({
         return addItemToGuestUserCart(input, ctx);
       }
     }),
-  sumQuantities: publicProcedure.query(async ({ ctx }) => {
+  sumItemsQuantities: publicProcedure.query(async ({ ctx }) => {
     const user = ctx.session?.user;
     if (user) {
       // logged in user

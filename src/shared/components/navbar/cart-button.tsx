@@ -4,17 +4,17 @@ import NextLink from 'next/link';
 
 import { Badge, Icon, Link } from '@chakra-ui/react';
 
-import { useSumCartQuantities } from '~/features/cart/hooks';
+import { useSumCartItemsQuantities } from '~/features/cart/hooks';
 
 import { NavbarIconButton } from './navbar-icon-button';
 
 const CartButton = () => {
-  const variantsInCart = useSumCartQuantities();
+  const sumCartItemsQuantities = useSumCartItemsQuantities();
 
-  const variantsInCartValue = variantsInCart.data || 0;
+  const sumCartItemsQuantitiesValue = sumCartItemsQuantities.data || 0;
   const variantsInCartTxt =
-    variantsInCartValue > 99 ? '99+' : `${variantsInCartValue}`;
-  const badgeFontSize = variantsInCartValue > 99 ? 9 : 11;
+    sumCartItemsQuantitiesValue > 99 ? '99+' : `${sumCartItemsQuantitiesValue}`;
+  const badgeFontSize = sumCartItemsQuantitiesValue > 99 ? 9 : 11;
 
   return (
     <NextLink href="/cart" passHref legacyBehavior>
@@ -28,7 +28,7 @@ const CartButton = () => {
           aria-label="Go to the Cart page"
           tabIndex={-1}
         />
-        {variantsInCartValue > 0 && (
+        {sumCartItemsQuantitiesValue > 0 && (
           <Badge
             colorScheme="secondary"
             sx={{
