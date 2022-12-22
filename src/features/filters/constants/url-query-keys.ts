@@ -10,14 +10,14 @@ export const URL_QUERY_KEYS = {
 
 export const URL_QUERY_KEYS_VALIDATIONS = {
   [URL_QUERY_KEYS.CATEGORY_ID]: z.string().min(1),
-  [URL_QUERY_KEYS.MIN_PRICE]: z.union([
-    z.coerce.number().gte(0),
-    z.string().length(0),
-  ]),
-  [URL_QUERY_KEYS.MAX_PRICE]: z.union([
-    z.coerce.number().gte(1),
-    z.string().length(0),
-  ]),
+  [URL_QUERY_KEYS.MIN_PRICE]: z.string().refine((val) => {
+    const n = Number(val);
+    return !Number.isNaN(n) && n >= 0;
+  }),
+  [URL_QUERY_KEYS.MAX_PRICE]: z.string().refine((val) => {
+    const n = Number(val);
+    return !Number.isNaN(n) && n >= 1;
+  }),
   [URL_QUERY_KEYS.COLOR_ID]: z.string().min(1),
   [URL_QUERY_KEYS.SIZE_ID]: z.string().min(1),
 };
