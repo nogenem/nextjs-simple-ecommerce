@@ -198,7 +198,7 @@ const PRODUCTS: {
     ],
     category: 'Animal',
     discount: {
-      percent: 1000,
+      percent: 10.0,
       valid_until: THIRTY_DAYS,
     },
     data: {

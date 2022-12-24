@@ -125,11 +125,11 @@ const getHomeProducts = async (
     ? Prisma.sql`(a2.type = ${AttributeType.Size} AND a2.id = ${sizeId})`
     : Prisma.sql`(a2.type = ${AttributeType.Size} AND a2.id IS NOT NULL)`;
   const discountedPriceClause = Prisma.sql`
-  v.price * (1 - IFNULL(d.percent, 0) / 100 / 100)
+  v.price * (1 - IFNULL(d.percent, 0) / 100)
   `;
   // If out of stock, then i want it showing up at the bottom, hence the multiplication by 10
   const discountedPriceWithStockClause = Prisma.sql`
-  IF(v.quantity_in_stock > 0, 1, 10) * v.price * (1 - IFNULL(d.percent, 0) / 100 / 100)
+  IF(v.quantity_in_stock > 0, 1, 10) * v.price * (1 - IFNULL(d.percent, 0) / 100)
   `;
 
   // Find the products

@@ -93,6 +93,7 @@ model Product {
 
 model Variant {
   id                 String         @id @default(cuid())
+  // Price should be an integer value, so $10.30 should be saved as 1030
   price              Int
   currency_code      CurrencyCode   @default(USD)
   sku                String
@@ -120,7 +121,7 @@ model Category {
 
 model Discount {
   id          String    @id @default(cuid())
-  percent     Int
+  percent     Float
   valid_until DateTime
   created_at  DateTime  @default(now())
   updated_at  DateTime  @default(now()) @updatedAt
