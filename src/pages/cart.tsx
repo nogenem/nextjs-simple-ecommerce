@@ -27,6 +27,7 @@ import {
 } from '@chakra-ui/react';
 
 import { useCartItems } from '~/features/cart/hooks';
+import { calculateCartSubtotal } from '~/features/cart/utils/calculate-cart-subtotal';
 import { useHorizontalScroll } from '~/shared/hooks';
 import { formatPrice } from '~/shared/utils/format-price';
 import type { RouterOutputs } from '~/shared/utils/trpc';
@@ -41,8 +42,7 @@ const Cart: NextPage = () => {
 
   useHorizontalScroll(tableContainerRef);
 
-  // TODO: Calc the real subtotal
-  const cartSubTotal = '$20.00';
+  const cartSubtotal = formatPrice(calculateCartSubtotal(items));
 
   return (
     <>
@@ -99,7 +99,7 @@ const Cart: NextPage = () => {
                   Subtotal:
                 </Td>
                 <Td color={primaryColor} fontSize="xl">
-                  {cartSubTotal}
+                  {cartSubtotal}
                 </Td>
                 <Td></Td>
               </Tr>

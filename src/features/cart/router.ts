@@ -1,11 +1,4 @@
-import type {
-  Attribute,
-  CartItem,
-  Discount,
-  Product,
-  Variant,
-  VariantImage,
-} from '@prisma/client';
+import type { CartItem } from '@prisma/client';
 import nookies from 'nookies';
 import { z } from 'zod';
 
@@ -15,20 +8,11 @@ import {
   TEMP_CART_COOKIE_DATA,
   TEMP_CART_COOKIE_KEY,
 } from '~/shared/constants/cookies';
-import type { CartWithItems } from '~/shared/types/globals';
+import type {
+  CartWithItems,
+  TCartItemWithVariant,
+} from '~/shared/types/globals';
 import type { RouterInputs } from '~/shared/utils/trpc';
-
-type TCartItemWithVariant = CartItem & {
-  variant:
-    | (Variant & {
-        product: Product & {
-          discount: Discount | null;
-        };
-        attributes: Attribute[];
-        images: VariantImage[];
-      })
-    | undefined;
-};
 
 export const cartRouter = router({
   addItem: publicProcedure

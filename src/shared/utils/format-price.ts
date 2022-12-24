@@ -1,5 +1,13 @@
-export function formatPrice(price: number, currencyCode: string, discount = 0) {
-  const value = (price / 100) * (1 - discount / 100 / 100);
+import { CurrencyCode } from '@prisma/client';
+
+import { calculatePrice } from './calculate-price';
+
+export function formatPrice(
+  price: number,
+  currencyCode: CurrencyCode = CurrencyCode.USD,
+  discount = 0,
+) {
+  const value = calculatePrice(price, discount) / 100;
 
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
