@@ -6,6 +6,8 @@ import { getRandomArbitrary } from '../utils';
 export const seeder = async (prisma: PrismaClient) => {
   console.log('>> Deleting product data...');
   await Promise.all([
+    prisma.cart.deleteMany(),
+    prisma.cartItem.deleteMany(),
     prisma.category.deleteMany(),
     prisma.attribute.deleteMany(),
     prisma.variantImage.deleteMany(),
