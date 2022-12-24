@@ -3,3 +3,8 @@
   margin-inline-start: 1em;
   list-style-type: initial;
 }
+
+.cart-table th,
+.cart-table td {
+  text-align: center;
+}

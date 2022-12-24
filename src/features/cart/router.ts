@@ -1,4 +1,11 @@
-import type { CartItem } from '@prisma/client';
+import type {
+  Attribute,
+  CartItem,
+  Discount,
+  Product,
+  Variant,
+  VariantImage,
+} from '@prisma/client';
 import nookies from 'nookies';
 import { z } from 'zod';
 
@@ -10,6 +17,18 @@ import {
 } from '~/shared/constants/cookies';
 import type { CartWithItems } from '~/shared/types/globals';
 import type { RouterInputs } from '~/shared/utils/trpc';
+
+type TCartItemWithVariant = CartItem & {
+  variant:
+    | (Variant & {
+        product: Product & {
+          discount: Discount | null;
+        };
+        attributes: Attribute[];
+        images: VariantImage[];
+      })
+    | undefined;
+};
 
 export const cartRouter = router({
   addItem: publicProcedure
@@ -102,6 +121,16 @@ export const cartRouter = router({
         return count._count.id;
       }
     }),
+  items: publicProcedure.query(async ({ ctx }) => {
+    const user = ctx.session?.user;
+    if (user) {
+      // logged in user
+      return await getLoggedInUserCartItems(user.id, ctx);
+    } else {
+      // guest user
+      return await getGuestUserCartItems(ctx);
+    }
+  }),
 });
 
 const getTempCart = (ctx: Context) => {
@@ -193,4 +222,89 @@ const addItemToGuestUserCart = (
   );
 
   return cartItem;
+};
+
+const getLoggedInUserCartItems = async (userId: string, ctx: Context) => {
+  const items = await ctx.prisma.cartItem.findMany({
+    where: {
+      cart: {
+        userId,
+      },
+    },
+    include: {
+      variant: {
+        include: {
+          attributes: true,
+          images: true,
+          product: {
+            include: {
+              discount: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const NOW = new Date();
+  return items.map((item) => {
+    if (
+      item.variant?.product.discount &&
+      item.variant.product.discount.valid_until <= NOW
+    ) {
+      item.variant.product.discount = null;
+    }
+    return item;
+  });
+};
+
+const getGuestUserCartItems = async (ctx: Context) => {
+  const tmpCart = getTempCart(ctx);
+
+  if (!tmpCart.id) return [] as TCartItemWithVariant[];
+
+  const variantIds = tmpCart.items.map((item) => item.variantId);
+
+  const variants = await ctx.prisma.variant.findMany({
+    where: {
+      id: {
+        in: variantIds,
+      },
+    },
+    include: {
+      attributes: true,
+      images: true,
+      product: {
+        include: {
+          discount: true,
+        },
+      },
+    },
+  });
+
+  const variantIdToVariantObj = variants.reduce((prev, curr) => {
+    if (!prev[curr.id]) {
+      prev[curr.id] = curr;
+    }
+    return prev;
+  }, {} as Record<string, typeof variants[number]>);
+
+  const items = tmpCart.items.map((item) => {
+    const newItem: TCartItemWithVariant = {
+      ...item,
+      variant: variantIdToVariantObj[item.variantId],
+    };
+    return newItem;
+  });
+
+  const NOW = new Date();
+  return items.map((item) => {
+    if (
+      item.variant?.product.discount &&
+      item.variant.product.discount.valid_until <= NOW
+    ) {
+      item.variant.product.discount = null;
+    }
+    return item;
+  });
 };
