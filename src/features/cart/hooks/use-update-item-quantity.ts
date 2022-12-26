@@ -17,15 +17,10 @@ export const useUpdateItemQuantity = () => {
         duration: 5000,
       });
     },
-    onError: (error) => {
-      const description =
-        !error.data || error.data.code === 'INTERNAL_SERVER_ERROR'
-          ? 'Please, try again later'
-          : error.message;
-
+    onError: () => {
       toast({
         title: 'Unable to update item quantity.',
-        description,
+        description: 'Please, try again later',
         status: 'error',
         isClosable: true,
         duration: 5000,
