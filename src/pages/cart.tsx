@@ -22,6 +22,7 @@ import {
   Tfoot,
   Th,
   Thead,
+  Tooltip,
   Tr,
   useColorModeValue,
 } from '@chakra-ui/react';
@@ -120,8 +121,6 @@ const TableItem = ({
 }: {
   item: RouterOutputs['cart']['items'][number];
 }) => {
-  const discountedPriceTextColor = useColorModeValue('gray.600', 'gray.300');
-
   const { mutate: removeItemFromCart, isLoading: isRemovingItemFromCart } =
     useRemoveItemFromCart();
   const { mutate: updateItemQuantity, isLoading: isUpdatingItemQuantity } =
@@ -129,7 +128,11 @@ const TableItem = ({
 
   const handleQuantityChange = useDebouncedCallback(
     (valueAsString: string, valueAsNumber: number) => {
-      if (!!valueAsString && !Number.isNaN(valueAsNumber)) {
+      if (
+        !!valueAsString &&
+        !Number.isNaN(valueAsNumber) &&
+        variant?.available_for_sale
+      ) {
         updateItemQuantity({
           itemId: item.id,
           newQuantity: valueAsNumber,
@@ -148,16 +151,6 @@ const TableItem = ({
       return prev;
     }, [] as string[])
     .join(', ');
-
-  const priceWithoutDiscount = formatPrice(
-    variant.price,
-    variant.currency_code,
-  );
-  const priceWithDiscount = formatPrice(
-    variant.price,
-    variant.currency_code,
-    variant.product.discount?.percent,
-  );
 
   const handleRemoveItemClick = () => {
     removeItemFromCart({ itemId: item.id });
@@ -188,7 +181,7 @@ const TableItem = ({
             max={variant.quantity_in_stock}
             defaultValue={item.quantity}
             onChange={handleQuantityChange}
-            isDisabled={isUpdatingItemQuantity}
+            isDisabled={isUpdatingItemQuantity || !variant.available_for_sale}
             allowMouseWheel
             isValidCharacter={(value: string) => /[0-9]+/.test(value)}
           >
@@ -201,16 +194,7 @@ const TableItem = ({
         </Flex>
       </Td>
       <Td>
-        <Text>{priceWithDiscount}</Text>
-        {priceWithoutDiscount !== priceWithDiscount && (
-          <Text
-            fontSize="sm"
-            textDecor="line-through"
-            color={discountedPriceTextColor}
-          >
-            {priceWithoutDiscount}
-          </Text>
-        )}
+        <TableItemPriceText variant={variant} />
       </Td>
       <Td>
         <IconButton
@@ -225,6 +209,49 @@ const TableItem = ({
       </Td>
     </Tr>
   );
+};
+
+const TableItemPriceText = ({
+  variant,
+}: {
+  variant: NonNullable<RouterOutputs['cart']['items'][number]['variant']>;
+}) => {
+  const discountedPriceTextColor = useColorModeValue('gray.600', 'gray.300');
+
+  const priceWithoutDiscount = formatPrice(
+    variant.price,
+    variant.currency_code,
+  );
+  const priceWithDiscount = formatPrice(
+    variant.price,
+    variant.currency_code,
+    variant.product.discount?.percent,
+  );
+
+  let priceText = (
+    <>
+      <Text>{priceWithDiscount}</Text>
+      {priceWithoutDiscount !== priceWithDiscount && (
+        <Text
+          fontSize="sm"
+          textDecor="line-through"
+          color={discountedPriceTextColor}
+        >
+          {priceWithoutDiscount}
+        </Text>
+      )}
+    </>
+  );
+
+  if (!variant.available_for_sale) {
+    priceText = (
+      <Tooltip label="This product is not available to be purchased anymore">
+        <Text color="tomato">Not available</Text>
+      </Tooltip>
+    );
+  }
+
+  return priceText;
 };
 
 export default Cart;
