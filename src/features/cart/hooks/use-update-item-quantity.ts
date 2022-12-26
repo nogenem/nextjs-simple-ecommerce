@@ -36,5 +36,7 @@ export const useUpdateItemQuantity = () => {
   return {
     mutate: mutation.mutate,
     isLoading: mutation.isLoading,
+    isError: mutation.isError,
+    lastValuesUsed: mutation.variables,
   };
 };

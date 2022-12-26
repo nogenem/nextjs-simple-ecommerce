@@ -8,9 +8,12 @@ export const calculateCartSubtotal = (items: TCartItemWithVariant[]) =>
       price = 0;
     }
 
-    return (
-      curr +
-      prev.quantity *
-        calculatePrice(price, prev.variant?.product.discount?.percent)
-    );
+    let quantity = prev.quantity;
+    if (prev.variant && prev.variant.quantity_in_stock < quantity) {
+      quantity = 0;
+    }
+
+    const discount = prev.variant?.product.discount?.percent;
+
+    return curr + quantity * calculatePrice(price, discount);
   }, 0);

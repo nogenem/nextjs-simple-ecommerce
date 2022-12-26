@@ -123,26 +123,9 @@ const TableItem = ({
 }) => {
   const { mutate: removeItemFromCart, isLoading: isRemovingItemFromCart } =
     useRemoveItemFromCart();
-  const { mutate: updateItemQuantity, isLoading: isUpdatingItemQuantity } =
-    useUpdateItemQuantity();
-
-  const handleQuantityChange = useDebouncedCallback(
-    (valueAsString: string, valueAsNumber: number) => {
-      if (
-        !!valueAsString &&
-        !Number.isNaN(valueAsNumber) &&
-        variant?.available_for_sale
-      ) {
-        updateItemQuantity({
-          itemId: item.id,
-          newQuantity: valueAsNumber,
-        });
-      }
-    },
-    500,
-  );
 
   const variant = item.variant;
+
   if (!variant) return null;
 
   const variantDescription = variant.attributes
@@ -173,28 +156,10 @@ const TableItem = ({
         <Text fontSize="sm">{variantDescription}</Text>
       </Td>
       <Td>
-        <Flex w="100%" justifyContent="center">
-          <NumberInput
-            key={item.quantity}
-            maxW="100"
-            min={1}
-            max={variant.quantity_in_stock}
-            defaultValue={item.quantity}
-            onChange={handleQuantityChange}
-            isDisabled={isUpdatingItemQuantity || !variant.available_for_sale}
-            allowMouseWheel
-            isValidCharacter={(value: string) => /[0-9]+/.test(value)}
-          >
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-        </Flex>
+        <TableItemQuantityInput item={item} />
       </Td>
       <Td>
-        <TableItemPriceText variant={variant} />
+        <TableItemPriceText item={item} />
       </Td>
       <Td>
         <IconButton
@@ -211,12 +176,81 @@ const TableItem = ({
   );
 };
 
-const TableItemPriceText = ({
-  variant,
+const TableItemQuantityInput = ({
+  item,
 }: {
-  variant: NonNullable<RouterOutputs['cart']['items'][number]['variant']>;
+  item: RouterOutputs['cart']['items'][number];
+}) => {
+  const {
+    mutate: updateItemQuantity,
+    isLoading: isUpdatingItemQuantity,
+    isError: gotAnErrorWhileUpdatingItemQuantity,
+    lastValuesUsed,
+  } = useUpdateItemQuantity();
+
+  const handleQuantityChange = useDebouncedCallback(
+    (valueAsString: string, valueAsNumber: number) => {
+      if (
+        !!valueAsString &&
+        !Number.isNaN(valueAsNumber) &&
+        variant?.available_for_sale
+      ) {
+        updateItemQuantity({
+          itemId: item.id,
+          newQuantity: valueAsNumber,
+        });
+      }
+    },
+    500,
+  );
+
+  const variant = item.variant;
+
+  if (!variant) return null;
+
+  const quantityErrorTooltipLabel =
+    variant.quantity_in_stock < item.quantity ||
+    (gotAnErrorWhileUpdatingItemQuantity &&
+      !!lastValuesUsed &&
+      variant.quantity_in_stock < lastValuesUsed.newQuantity)
+      ? getOutOfStockLabelText(variant.quantity_in_stock)
+      : '';
+
+  return (
+    <Flex w="100%" justifyContent="center">
+      <Tooltip label={quantityErrorTooltipLabel}>
+        <NumberInput
+          key={item.quantity}
+          maxW="100"
+          min={1}
+          max={variant.quantity_in_stock}
+          defaultValue={item.quantity}
+          onChange={handleQuantityChange}
+          isDisabled={isUpdatingItemQuantity || !variant.available_for_sale}
+          allowMouseWheel
+          isValidCharacter={(value: string) => /[0-9]+/.test(value)}
+        >
+          <NumberInputField />
+          <NumberInputStepper>
+            <NumberIncrementStepper />
+            <NumberDecrementStepper />
+          </NumberInputStepper>
+        </NumberInput>
+      </Tooltip>
+    </Flex>
+  );
+};
+
+const TableItemPriceText = ({
+  item,
+}: {
+  item: RouterOutputs['cart']['items'][number];
 }) => {
   const discountedPriceTextColor = useColorModeValue('gray.600', 'gray.300');
+
+  const variant = item.variant;
+
+  if (!variant) return null;
 
   const priceWithoutDiscount = formatPrice(
     variant.price,
@@ -251,7 +285,20 @@ const TableItemPriceText = ({
     );
   }
 
+  if (variant.quantity_in_stock < item.quantity) {
+    priceText = (
+      <Tooltip label={getOutOfStockLabelText(variant.quantity_in_stock)}>
+        <Text color="tomato">Out of stock</Text>
+      </Tooltip>
+    );
+  }
+
   return priceText;
 };
+
+const getOutOfStockLabelText = (quantity_in_stock: number) =>
+  quantity_in_stock === 0
+    ? "We don't have any of this item in stock"
+    : `We only have ${quantity_in_stock} of this item available`;
 
 export default Cart;
