@@ -13,6 +13,7 @@ import {
 
 import { URL_QUERY_KEYS } from '~/features/filters/constants/url-query-keys';
 import { useFilterByKey } from '~/features/filters/hooks';
+import { useDebouncedCallback } from '~/shared/hooks';
 
 import { FilterRowHeader } from './filter-row-header';
 
@@ -46,28 +47,28 @@ const PriceFilterRow = () => {
     router.push(url, undefined, { shallow: true });
   };
 
-  const handleMinPriceChange = (
-    valueAsString: string,
-    valueAsNumber: number,
-  ) => {
-    const nextMinPrice = Number.isNaN(valueAsNumber) ? '' : valueAsString;
-    let nextMaxPrice = maxPrice;
+  const handleMinPriceChange = useDebouncedCallback(
+    (valueAsString: string, valueAsNumber: number) => {
+      const nextMinPrice = Number.isNaN(valueAsNumber) ? '' : valueAsString;
+      let nextMaxPrice = maxPrice;
 
-    if (nextMaxPrice !== '' && +nextMaxPrice < valueAsNumber + 1) {
-      nextMaxPrice = `${valueAsNumber + 1}`;
-    }
+      if (nextMaxPrice !== '' && +nextMaxPrice < valueAsNumber + 1) {
+        nextMaxPrice = `${valueAsNumber + 1}`;
+      }
 
-    updateRouterQuery(nextMinPrice, nextMaxPrice);
-  };
+      updateRouterQuery(nextMinPrice, nextMaxPrice);
+    },
+    500,
+  );
 
-  const handleMaxPriceChange = (
-    valueAsString: string,
-    valueAsNumber: number,
-  ) => {
-    const nextMaxPrice = Number.isNaN(valueAsNumber) ? '' : valueAsString;
+  const handleMaxPriceChange = useDebouncedCallback(
+    (valueAsString: string, valueAsNumber: number) => {
+      const nextMaxPrice = Number.isNaN(valueAsNumber) ? '' : valueAsString;
 
-    updateRouterQuery(minPrice, nextMaxPrice);
-  };
+      updateRouterQuery(minPrice, nextMaxPrice);
+    },
+    500,
+  );
 
   return (
     <Flex direction="column">
@@ -77,7 +78,12 @@ const PriceFilterRow = () => {
       />
       <FormControl mb="2">
         <FormLabel>Min. price</FormLabel>
-        <NumberInput min={0} value={minPrice} onChange={handleMinPriceChange}>
+        <NumberInput
+          key={minPrice}
+          min={0}
+          defaultValue={minPrice}
+          onChange={handleMinPriceChange}
+        >
           <NumberInputField />
           <NumberInputStepper>
             <NumberIncrementStepper />
@@ -88,8 +94,9 @@ const PriceFilterRow = () => {
       <FormControl>
         <FormLabel>Max. price</FormLabel>
         <NumberInput
+          key={maxPrice}
           min={(+minPrice || 0) + 1}
-          value={maxPrice}
+          defaultValue={maxPrice}
           onChange={handleMaxPriceChange}
         >
           <NumberInputField />
