@@ -1,7 +1,7 @@
 import { type NextPage } from 'next';
 import Head from 'next/head';
 
-import { Box, Flex } from '@chakra-ui/react';
+import { Box, Flex, Text } from '@chakra-ui/react';
 
 import { HomeFiltersContainer } from '~/features/filters/components';
 import { useFiltersSync } from '~/features/filters/hooks';
@@ -22,20 +22,27 @@ const Home: NextPage = () => {
       </Head>
       <Flex direction={{ base: 'column', md: 'row' }} w="100%">
         <HomeFiltersContainer />
-        {isLoading && <Box w="100%">Loading...</Box>}
-        {!!products.length && (
-          <Flex
-            w="100%"
-            wrap="wrap"
-            grow="1"
-            justify={{ base: 'center', md: 'flex-start' }}
-            gap="3"
-          >
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </Flex>
-        )}
+        <Flex
+          w="100%"
+          wrap="wrap"
+          grow="1"
+          justify={{ base: 'center', md: 'flex-start' }}
+          gap="3"
+        >
+          {isLoading && (
+            <Box w="100%">
+              <Text fontSize="xl">Loading...</Text>
+            </Box>
+          )}
+          {!isLoading && products.length === 0 && (
+            <Box w="100%">
+              <Text fontSize="xl">No product found</Text>
+            </Box>
+          )}
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </Flex>
       </Flex>
     </>
   );
