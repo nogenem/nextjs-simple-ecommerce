@@ -26,7 +26,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 
-import { useCartItems } from '~/features/cart/hooks';
+import { useCartItems, useRemoveItemFromCart } from '~/features/cart/hooks';
 import { calculateCartSubtotal } from '~/features/cart/utils/calculate-cart-subtotal';
 import { useHorizontalScroll } from '~/shared/hooks';
 import { formatPrice } from '~/shared/utils/format-price';
@@ -118,6 +118,9 @@ const TableItem = ({
 }) => {
   const discountedPriceTextColor = useColorModeValue('gray.600', 'gray.300');
 
+  const { mutate: removeItemFromCart, isLoading: isRemovingItemFromCart } =
+    useRemoveItemFromCart();
+
   const variant = item.variant;
   if (!variant) return null;
 
@@ -143,7 +146,7 @@ const TableItem = ({
   };
 
   const handleRemoveItemClick = () => {
-    // TODO: Remove item from cart
+    removeItemFromCart({ itemId: item.id });
   };
 
   return (
@@ -198,6 +201,7 @@ const TableItem = ({
           aria-label="Remove item from cart"
           icon={<CloseIcon />}
           onClick={handleRemoveItemClick}
+          isLoading={isRemovingItemFromCart}
         />
       </Td>
     </Tr>

@@ -115,6 +115,40 @@ export const cartRouter = router({
       return await getGuestUserCartItems(ctx);
     }
   }),
+  removeItem: publicProcedure
+    .input(
+      z.object({
+        itemId: z.string(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const user = ctx.session?.user;
+      if (user) {
+        // logged in user
+        return await ctx.prisma.cartItem.delete({
+          where: {
+            id: input.itemId,
+          },
+        });
+      } else {
+        // guest user
+        const cart = getTempCart(ctx);
+
+        const cartItem = cart.items.find((item) => item.id === input.itemId);
+        if (!!cartItem) {
+          cart.items = cart.items.filter((item) => item.id !== input.itemId);
+
+          nookies.set(
+            ctx,
+            TEMP_CART_COOKIE_KEY,
+            JSON.stringify(cart),
+            TEMP_CART_COOKIE_DATA,
+          );
+        }
+
+        return cartItem;
+      }
+    }),
 });
 
 const getTempCart = (ctx: Context) => {
