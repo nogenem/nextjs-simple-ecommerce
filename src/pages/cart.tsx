@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useRef } from 'react';
 
 import { type NextPage } from 'next';
 import Head from 'next/head';
@@ -25,7 +25,6 @@ import {
   Tr,
   useColorModeValue,
 } from '@chakra-ui/react';
-import debounce from 'lodash.debounce';
 
 import {
   useCartItems,
@@ -33,7 +32,7 @@ import {
   useUpdateItemQuantity,
 } from '~/features/cart/hooks';
 import { calculateCartSubtotal } from '~/features/cart/utils/calculate-cart-subtotal';
-import { useHorizontalScroll } from '~/shared/hooks';
+import { useDebouncedCallback, useHorizontalScroll } from '~/shared/hooks';
 import { formatPrice } from '~/shared/utils/format-price';
 import type { RouterOutputs } from '~/shared/utils/trpc';
 
@@ -128,17 +127,16 @@ const TableItem = ({
   const { mutate: updateItemQuantity, isLoading: isUpdatingItemQuantity } =
     useUpdateItemQuantity();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleQuantityChange = useCallback(
-    debounce((valueAsString: string, valueAsNumber: number) => {
+  const handleQuantityChange = useDebouncedCallback(
+    (valueAsString: string, valueAsNumber: number) => {
       if (!!valueAsString && !Number.isNaN(valueAsNumber)) {
         updateItemQuantity({
           itemId: item.id,
           newQuantity: valueAsNumber,
         });
       }
-    }, 250),
-    [],
+    },
+    500,
   );
 
   const variant = item.variant;
@@ -184,6 +182,7 @@ const TableItem = ({
       <Td>
         <Flex w="100%" justifyContent="center">
           <NumberInput
+            key={item.quantity}
             maxW="100"
             min={1}
             max={variant.quantity_in_stock}
