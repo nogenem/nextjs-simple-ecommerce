@@ -136,16 +136,21 @@ export const cartRouter = router({
         const cart = getTempCart(ctx);
 
         const cartItem = cart.items.find((item) => item.id === input.itemId);
-        if (!!cartItem) {
-          cart.items = cart.items.filter((item) => item.id !== input.itemId);
 
-          nookies.set(
-            ctx,
-            TEMP_CART_COOKIE_KEY,
-            JSON.stringify(cart),
-            TEMP_CART_COOKIE_DATA,
-          );
+        if (!cartItem) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Item not found.',
+          });
         }
+
+        cart.items = cart.items.filter((item) => item.id !== input.itemId);
+        nookies.set(
+          ctx,
+          TEMP_CART_COOKIE_KEY,
+          JSON.stringify(cart),
+          TEMP_CART_COOKIE_DATA,
+        );
 
         return cartItem;
       }

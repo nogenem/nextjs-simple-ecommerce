@@ -17,10 +17,15 @@ export const useRemoveItemFromCart = () => {
         duration: 5000,
       });
     },
-    onError: () => {
+    onError: (error) => {
+      const description =
+        !error.data || error.data.code === 'INTERNAL_SERVER_ERROR'
+          ? 'Please, try again later'
+          : error.message;
+
       toast({
         title: 'Unable to remove item from the cart.',
-        description: 'Please, try again later',
+        description,
         status: 'error',
         isClosable: true,
         duration: 5000,
