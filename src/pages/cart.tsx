@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { type NextPage } from 'next';
 import Head from 'next/head';
@@ -25,8 +25,13 @@ import {
   Tr,
   useColorModeValue,
 } from '@chakra-ui/react';
+import debounce from 'lodash.debounce';
 
-import { useCartItems, useRemoveItemFromCart } from '~/features/cart/hooks';
+import {
+  useCartItems,
+  useRemoveItemFromCart,
+  useUpdateItemQuantity,
+} from '~/features/cart/hooks';
 import { calculateCartSubtotal } from '~/features/cart/utils/calculate-cart-subtotal';
 import { useHorizontalScroll } from '~/shared/hooks';
 import { formatPrice } from '~/shared/utils/format-price';
@@ -120,6 +125,21 @@ const TableItem = ({
 
   const { mutate: removeItemFromCart, isLoading: isRemovingItemFromCart } =
     useRemoveItemFromCart();
+  const { mutate: updateItemQuantity, isLoading: isUpdatingItemQuantity } =
+    useUpdateItemQuantity();
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleQuantityChange = useCallback(
+    debounce((valueAsString: string, valueAsNumber: number) => {
+      if (!!valueAsString && !Number.isNaN(valueAsNumber)) {
+        updateItemQuantity({
+          itemId: item.id,
+          newQuantity: valueAsNumber,
+        });
+      }
+    }, 250),
+    [],
+  );
 
   const variant = item.variant;
   if (!variant) return null;
@@ -140,10 +160,6 @@ const TableItem = ({
     variant.currency_code,
     variant.product.discount?.percent,
   );
-
-  const handleQuantityChange = () => {
-    // TODO: Update quantity with debounce!?
-  };
 
   const handleRemoveItemClick = () => {
     removeItemFromCart({ itemId: item.id });
@@ -170,8 +186,12 @@ const TableItem = ({
           <NumberInput
             maxW="100"
             min={1}
+            max={variant.quantity_in_stock}
             defaultValue={item.quantity}
             onChange={handleQuantityChange}
+            isDisabled={isUpdatingItemQuantity}
+            allowMouseWheel
+            isValidCharacter={(value: string) => /[0-9]+/.test(value)}
           >
             <NumberInputField />
             <NumberInputStepper>

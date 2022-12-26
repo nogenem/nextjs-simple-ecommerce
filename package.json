@@ -34,6 +34,7 @@
     "@trpc/server": "^10.0.0",
     "eslint-config-prettier": "^8.5.0",
     "framer-motion": "^7.6.18",
+    "lodash.debounce": "^4.0.8",
     "next": "13.0.2",
     "next-auth": "4.17.0",
     "nookies": "^2.5.2",
@@ -47,6 +48,7 @@
     "zustand": "^4.1.5"
   },
   "devDependencies": {
+    "@types/lodash.debounce": "^4.0.7",
     "@types/node": "^18.0.0",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",

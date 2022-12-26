@@ -1,4 +1,5 @@
 import type { CartItem } from '@prisma/client';
+import { TRPCError } from '@trpc/server';
 import nookies from 'nookies';
 import { z } from 'zod';
 
@@ -145,6 +146,100 @@ export const cartRouter = router({
             TEMP_CART_COOKIE_DATA,
           );
         }
+
+        return cartItem;
+      }
+    }),
+  updateItemQuantity: publicProcedure
+    .input(
+      z.object({
+        itemId: z.string(),
+        newQuantity: z.number().min(1),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const user = ctx.session?.user;
+      if (user) {
+        // logged in user
+        const item = await ctx.prisma.cartItem.findFirst({
+          where: {
+            id: input.itemId,
+          },
+          select: {
+            id: true,
+            variant: {
+              select: {
+                quantity_in_stock: true,
+              },
+            },
+          },
+        });
+
+        if (!item) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Item not found.',
+          });
+        }
+
+        if (item.variant.quantity_in_stock < input.newQuantity) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Not enough products in stock.',
+          });
+        }
+
+        return await ctx.prisma.cartItem.update({
+          where: {
+            id: input.itemId,
+          },
+          data: {
+            quantity: input.newQuantity,
+          },
+        });
+      } else {
+        // guest user
+        const cart = getTempCart(ctx);
+
+        const cartItem = cart.items.find((item) => item.id === input.itemId);
+
+        if (!cartItem) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Item not found.',
+          });
+        }
+
+        const variant = await ctx.prisma.variant.findFirst({
+          where: {
+            id: cartItem.variantId,
+          },
+          select: {
+            quantity_in_stock: true,
+          },
+        });
+
+        if (!variant) {
+          throw new TRPCError({
+            code: 'NOT_FOUND',
+            message: 'Product variant not found.',
+          });
+        }
+
+        if (variant.quantity_in_stock < input.newQuantity) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Not enough products in stock.',
+          });
+        }
+
+        cartItem.quantity = input.newQuantity;
+        nookies.set(
+          ctx,
+          TEMP_CART_COOKIE_KEY,
+          JSON.stringify(cart),
+          TEMP_CART_COOKIE_DATA,
+        );
 
         return cartItem;
       }
