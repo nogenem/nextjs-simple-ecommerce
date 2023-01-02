@@ -4,8 +4,9 @@ import { type NextPage } from 'next';
 import Head from 'next/head';
 import NextImage from 'next/image';
 
-import { CloseIcon } from '@chakra-ui/icons';
+import { ArrowForwardIcon, CloseIcon } from '@chakra-ui/icons';
 import {
+  Button,
   Flex,
   Heading,
   IconButton,
@@ -33,6 +34,7 @@ import {
   useUpdateItemQuantity,
 } from '~/features/cart/hooks';
 import { calculateCartSubtotal } from '~/features/cart/utils/calculate-cart-subtotal';
+import { hasAnyInvalidItem } from '~/features/cart/utils/has-any-invalid-item';
 import { useDebouncedCallback, useHorizontalScroll } from '~/shared/hooks';
 import { formatPrice } from '~/shared/utils/format-price';
 import type { RouterOutputs } from '~/shared/utils/trpc';
@@ -48,6 +50,15 @@ const Cart: NextPage = () => {
   useHorizontalScroll(tableContainerRef);
 
   const cartSubtotal = formatPrice(calculateCartSubtotal(items));
+
+  const cartHasAnyInvalidItem = hasAnyInvalidItem(items);
+
+  const isCheckoutButtonDisabled = cartHasAnyInvalidItem || items.length === 0;
+  const checkoutButtonTooltip = cartHasAnyInvalidItem
+    ? 'Please, handle the invalid items in the cart to continue'
+    : items.length === 0
+    ? 'Please, add some items to your cart to continue'
+    : '';
 
   return (
     <>
@@ -111,6 +122,19 @@ const Cart: NextPage = () => {
             </Tfoot>
           </Table>
         </TableContainer>
+        <Flex w="100%" mt="2" justifyContent="center" alignItems="center">
+          <Tooltip label={checkoutButtonTooltip}>
+            <Button
+              rightIcon={<ArrowForwardIcon />}
+              variant="outline"
+              colorScheme="primary"
+              size="lg"
+              isDisabled={isCheckoutButtonDisabled}
+            >
+              Checkout
+            </Button>
+          </Tooltip>
+        </Flex>
       </Flex>
     </>
   );
