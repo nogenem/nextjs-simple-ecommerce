@@ -69,6 +69,9 @@ export const productsRouter = router({
               attributes: true,
               images: true,
             },
+            where: {
+              available_for_sale: true,
+            },
           },
           category: true,
           discount: true,

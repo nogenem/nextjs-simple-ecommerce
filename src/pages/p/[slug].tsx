@@ -125,7 +125,9 @@ const Product = () => {
       )}
     </>
   );
-  if (variant.quantity_in_stock === 0) {
+
+  const isSoldOut = variant.quantity_in_stock === 0;
+  if (isSoldOut) {
     priceText = (
       <Text color={soldOutTextColor} fontSize="2xl">
         Sold out
@@ -148,14 +150,21 @@ const Product = () => {
     valueAsString: string,
     valueAsNumber: number,
   ) => {
-    if (!!valueAsString && !Number.isNaN(valueAsNumber)) {
+    if (
+      !!valueAsString &&
+      !Number.isNaN(valueAsNumber) &&
+      !isSoldOut &&
+      variant.quantity_in_stock >= valueAsNumber
+    ) {
       setQuantityToAdd(valueAsNumber);
     }
   };
 
   const handleAddToCartClick = () => {
-    addItemToCart({ variantId: variant.id, quantity: quantityToAdd });
-    setQuantityToAdd(1);
+    if (!isSoldOut) {
+      addItemToCart({ variantId: variant.id, quantity: quantityToAdd });
+      setQuantityToAdd(1);
+    }
   };
 
   const nVariantsInCartMessage =
@@ -238,11 +247,14 @@ const Product = () => {
           </Box>
 
           <FormControl>
-            <FormLabel>Quantity</FormLabel>
+            <FormLabel>
+              Quantity ({variant.quantity_in_stock} in stock)
+            </FormLabel>
             <NumberInput
               min={1}
               value={quantityToAdd}
               onChange={handleQuantityToAddChange}
+              isDisabled={isSoldOut}
             >
               <NumberInputField />
               <NumberInputStepper>
@@ -258,6 +270,7 @@ const Product = () => {
               colorScheme="primary"
               onClick={handleAddToCartClick}
               isLoading={isAddingItemToCart}
+              isDisabled={isSoldOut}
               w="100%"
             >
               Add to cart
