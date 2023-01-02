@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import { type NextPage } from 'next';
 import Head from 'next/head';
 import NextImage from 'next/image';
+import { useRouter } from 'next/router';
 
 import { ArrowForwardIcon, CloseIcon } from '@chakra-ui/icons';
 import {
@@ -42,6 +43,7 @@ import type { RouterOutputs } from '~/shared/utils/trpc';
 const IMAGE_SIZE = 80;
 
 const Cart: NextPage = () => {
+  const router = useRouter();
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const { items, isLoading } = useCartItems();
 
@@ -59,6 +61,10 @@ const Cart: NextPage = () => {
     : items.length === 0
     ? 'Please, add some items to your cart to continue'
     : '';
+
+  const handleCheckoutBtnClick = () => {
+    router.push('/checkout');
+  };
 
   return (
     <>
@@ -122,6 +128,7 @@ const Cart: NextPage = () => {
             </Tfoot>
           </Table>
         </TableContainer>
+
         <Flex w="100%" mt="2" justifyContent="center" alignItems="center">
           <Tooltip label={checkoutButtonTooltip}>
             <Button
@@ -130,6 +137,7 @@ const Cart: NextPage = () => {
               colorScheme="primary"
               size="lg"
               isDisabled={isCheckoutButtonDisabled}
+              onClick={handleCheckoutBtnClick}
             >
               Checkout
             </Button>
