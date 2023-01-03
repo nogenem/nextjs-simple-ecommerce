@@ -180,6 +180,7 @@ const TableItem = ({
             alt={variant.images[0]?.alternative_text || ''}
             width={IMAGE_SIZE}
             height={IMAGE_SIZE}
+            style={{ maxWidth: 'unset' }}
           />
         </Flex>
       </Td>
