@@ -207,7 +207,9 @@ const ShippingAddressTabPanel = ({
         </FormControl>
 
         <Flex flexDirection="row-reverse">
-          <Button type="submit">Next</Button>
+          <Button type="submit" colorScheme="primary">
+            Next
+          </Button>
         </Flex>
       </form>
     </TabPanel>
@@ -256,7 +258,9 @@ const PaymentMethodTabPanel = ({
         </FormControl>
 
         <Flex flexDirection="row-reverse" gap="3">
-          <Button type="submit">Next</Button>
+          <Button type="submit" colorScheme="primary">
+            Next
+          </Button>
           <Button onClick={handleGoBack}>Back</Button>
         </Flex>
       </form>
