@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 
+import type { TableContainerProps } from '@chakra-ui/react';
 import {
   Table,
   TableContainer,
@@ -21,9 +22,12 @@ import { TableItem } from './table-item';
 
 type TCartItemsTableProps = {
   isEditable?: boolean;
-};
+} & TableContainerProps;
 
-const CartItemsTable = ({ isEditable = false }: TCartItemsTableProps) => {
+const CartItemsTable = ({
+  isEditable = false,
+  ...rest
+}: TCartItemsTableProps) => {
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
   const primaryColor = useColorModeValue('primary.500', 'primary.300');
@@ -35,7 +39,7 @@ const CartItemsTable = ({ isEditable = false }: TCartItemsTableProps) => {
   const cartSubtotal = formatPrice(calculateCartSubtotal(items));
 
   return (
-    <TableContainer ref={tableContainerRef} w="100%" mb="3">
+    <TableContainer ref={tableContainerRef} w="100%" {...rest}>
       <Table className="cart-table" variant="striped">
         <Thead>
           <Tr>

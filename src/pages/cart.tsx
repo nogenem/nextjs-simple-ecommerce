@@ -62,7 +62,7 @@ const Cart: NextPage = () => {
           Your cart
         </Heading>
 
-        <CartItemsTable isEditable />
+        <CartItemsTable isEditable mb="3" />
 
         <Flex w="100%" mt="2" justifyContent="center" alignItems="center">
           <Tooltip label={checkoutButtonTooltip}>
