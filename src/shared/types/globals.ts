@@ -29,3 +29,13 @@ export type TCartItemWithVariant = CartItem & {
       })
     | undefined;
 };
+
+// TODO: Will come from Prisma later
+export type Address = {
+  complement?: string;
+  country: string;
+  postal_code: string;
+  state: string;
+  city: string;
+  street_address: string;
+};

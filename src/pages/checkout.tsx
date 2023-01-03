@@ -6,11 +6,16 @@ import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 
 import {
+  Box,
   Button,
+  Card,
+  CardBody,
   CircularProgress,
   Flex,
   FormControl,
   FormLabel,
+  Heading,
+  HStack,
   Input,
   Radio,
   RadioGroup,
@@ -20,13 +25,18 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
+  Text,
   useToast,
 } from '@chakra-ui/react';
 import { z } from 'zod';
 
 import { useCartItems } from '~/features/cart/hooks';
+import { calculateCartSubtotal } from '~/features/cart/utils/calculate-cart-subtotal';
 import { hasAnyInvalidItem } from '~/features/cart/utils/has-any-invalid-item';
 import { useObjState } from '~/shared/hooks';
+import type { Address, TCartItemWithVariant } from '~/shared/types/globals';
+import { calculateShippingCost } from '~/shared/utils/calculate-shipping-cost';
+import { formatPrice } from '~/shared/utils/format-price';
 
 const AddressSchema = z.object({
   country: z.string().min(1),
@@ -39,7 +49,6 @@ const AddressSchema = z.object({
 
 const PaymentMethodSchema = z.enum(['paypal', 'stripe']);
 
-type Address = z.infer<typeof AddressSchema>;
 type PaymentMethod = z.infer<typeof PaymentMethodSchema>;
 
 type CheckoutState = {
@@ -134,7 +143,12 @@ const Checkout: NextPage = () => {
           handleSubmit={handlePaymentMethodTabSubmit}
           handleGoBack={handleGoBackOneStep}
         />
-        <PlaceOrderTabPanel handleGoBack={handleGoBackOneStep} />
+        <PlaceOrderTabPanel
+          items={items}
+          address={state.address}
+          paymentMethod={state.paymentMethod}
+          handleGoBack={handleGoBackOneStep}
+        />
       </TabPanels>
     </Tabs>
   );
@@ -268,11 +282,95 @@ const PaymentMethodTabPanel = ({
   );
 };
 
-const PlaceOrderTabPanel = ({ handleGoBack }: { handleGoBack: () => void }) => {
+const PlaceOrderTabPanel = ({
+  items,
+  address,
+  paymentMethod,
+  handleGoBack,
+}: {
+  items: TCartItemWithVariant[];
+  address?: Address;
+  paymentMethod?: PaymentMethod;
+  handleGoBack: () => void;
+}) => {
+  if (!address || !paymentMethod) return null;
+
+  const cartSubtotalPrice = calculateCartSubtotal(items);
+  const shippingCost = calculateShippingCost(address, cartSubtotalPrice);
+  const cartTotalPrice = cartSubtotalPrice + shippingCost;
+
+  let addressString = `${address.street_address}, `;
+  if (address.complement) {
+    addressString += `${address.complement}, `;
+  }
+  addressString += `${address.city}, ${address.state}, ${address.postal_code}, ${address.country}`;
+
   return (
     <TabPanel>
-      <p>Todo...</p>
-      <Flex flexDirection="row-reverse" gap="3">
+      <Flex
+        flexDir={{ base: 'column-reverse', lg: 'row' }}
+        justifyContent="space-between"
+        mb="3"
+      >
+        <Stack>
+          <Card>
+            <CardBody>
+              <Heading size="md" mb="3">
+                Shipping Address
+              </Heading>
+              <Text align="start">{addressString}</Text>
+            </CardBody>
+          </Card>
+
+          <Card>
+            <CardBody>
+              <Heading size="md" mb="3">
+                Payment Method
+              </Heading>
+              <Text align="start" textTransform="capitalize">
+                {paymentMethod}
+              </Text>
+            </CardBody>
+          </Card>
+
+          <Card>
+            <CardBody>
+              <Heading size="md" mb="3">
+                Order Items
+              </Heading>
+              <Text align="start" textTransform="capitalize">
+                ...
+              </Text>
+            </CardBody>
+          </Card>
+        </Stack>
+
+        <Box minW="250" mb={{ base: '3', lg: '0' }}>
+          <Card>
+            <CardBody>
+              <Stack>
+                <Heading size="md" mb="3">
+                  Order Summary
+                </Heading>
+                <HStack justifyContent="space-between">
+                  <Text>Items</Text>
+                  <Text>{formatPrice(cartSubtotalPrice)}</Text>
+                </HStack>
+                <HStack justifyContent="space-between">
+                  <Text>Shipping</Text>
+                  <Text>{formatPrice(shippingCost)}</Text>
+                </HStack>
+                <HStack justifyContent="space-between">
+                  <Text>Total</Text>
+                  <Text>{formatPrice(cartTotalPrice)}</Text>
+                </HStack>
+                <Button colorScheme="primary">Place Order</Button>
+              </Stack>
+            </CardBody>
+          </Card>
+        </Box>
+      </Flex>
+      <Flex flexDirection="row-reverse">
         <Button onClick={handleGoBack}>Back</Button>
       </Flex>
     </TabPanel>
