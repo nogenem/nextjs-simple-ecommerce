@@ -3,9 +3,11 @@ import { useEffect, useState } from 'react';
 
 import type { NextPage } from 'next';
 import { signIn, useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
 
 import {
   Button,
+  CircularProgress,
   Flex,
   FormControl,
   FormLabel,
@@ -22,6 +24,8 @@ import {
 } from '@chakra-ui/react';
 import { z } from 'zod';
 
+import { useCartItems } from '~/features/cart/hooks';
+import { hasAnyInvalidItem } from '~/features/cart/utils/has-any-invalid-item';
 import { useObjState } from '~/shared/hooks';
 
 const AddressSchema = z.object({
@@ -45,15 +49,32 @@ type CheckoutState = {
 
 const Checkout: NextPage = () => {
   const { status: sessionStatus } = useSession();
+  const toast = useToast();
+  const router = useRouter();
+
   const [step, setStep] = useState(1);
   const [state, setState] = useObjState<CheckoutState>({});
-  const toast = useToast();
+  const { items, isLoading: isItemsLoading } = useCartItems();
 
   useEffect(() => {
     if (sessionStatus === 'unauthenticated') {
       signIn('google');
     }
   }, [sessionStatus]);
+
+  useEffect(() => {
+    if (!isItemsLoading && (hasAnyInvalidItem(items) || items.length === 0)) {
+      router.push('/');
+    }
+  }, [items, isItemsLoading, router]);
+
+  if (isItemsLoading) {
+    return (
+      <Flex w="100%" alignItems="center" justifyContent="center">
+        <CircularProgress isIndeterminate color="primary.300" />
+      </Flex>
+    );
+  }
 
   const handleShippingAddressTabSubmit = (address: Address) => {
     const parsedData = AddressSchema.safeParse(address);
