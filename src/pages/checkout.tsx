@@ -31,6 +31,7 @@ import {
 } from '@chakra-ui/react';
 import { z } from 'zod';
 
+import { CartItemsTable } from '~/features/cart/components';
 import { useCartItems } from '~/features/cart/hooks';
 import { calculateCartSubtotal } from '~/features/cart/utils/calculate-cart-subtotal';
 import { hasAnyInvalidItem } from '~/features/cart/utils/has-any-invalid-item';
@@ -142,7 +143,7 @@ const Checkout: NextPage = () => {
           <Tab isDisabled={step !== 3}>Place Order</Tab>
         </TabList>
 
-        <TabPanels maxW="1000px">
+        <TabPanels maxW="65rem">
           <TabPanel>{/* User Login */}</TabPanel>
           <ShippingAddressTabPanel
             selectedAddress={state.address}
@@ -349,9 +350,7 @@ const PlaceOrderTabPanel = ({
               <Heading size="md" mb="3">
                 Order Items
               </Heading>
-              <Text align="start" textTransform="capitalize">
-                ...
-              </Text>
+              <CartItemsTable />
             </CardBody>
           </Card>
         </Stack>
