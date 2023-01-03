@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import type { NextPage } from 'next';
 import { signIn, useSession } from 'next-auth/react';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 import {
@@ -124,33 +125,43 @@ const Checkout: NextPage = () => {
   };
 
   return (
-    <Tabs align="center" isLazy index={step} onChange={setStep}>
-      <TabList>
-        <Tab isDisabled>User Login</Tab>
-        <Tab isDisabled={step !== 1}>Shipping Address</Tab>
-        <Tab isDisabled={step !== 2}>Payment Method</Tab>
-        <Tab isDisabled={step !== 3}>Place Order</Tab>
-      </TabList>
+    <>
+      <Head>
+        <title>Simple ECommerce - Checkout</title>
+        <meta
+          name="description"
+          content="The checkout page of this simple ecommerce"
+        />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <Tabs align="center" isLazy index={step} onChange={setStep}>
+        <TabList>
+          <Tab isDisabled>User Login</Tab>
+          <Tab isDisabled={step !== 1}>Shipping Address</Tab>
+          <Tab isDisabled={step !== 2}>Payment Method</Tab>
+          <Tab isDisabled={step !== 3}>Place Order</Tab>
+        </TabList>
 
-      <TabPanels maxW="1000px">
-        <TabPanel>{/* User Login */}</TabPanel>
-        <ShippingAddressTabPanel
-          selectedAddress={state.address}
-          handleSubmit={handleShippingAddressTabSubmit}
-        />
-        <PaymentMethodTabPanel
-          selectedPaymentMethod={state.paymentMethod}
-          handleSubmit={handlePaymentMethodTabSubmit}
-          handleGoBack={handleGoBackOneStep}
-        />
-        <PlaceOrderTabPanel
-          items={items}
-          address={state.address}
-          paymentMethod={state.paymentMethod}
-          handleGoBack={handleGoBackOneStep}
-        />
-      </TabPanels>
-    </Tabs>
+        <TabPanels maxW="1000px">
+          <TabPanel>{/* User Login */}</TabPanel>
+          <ShippingAddressTabPanel
+            selectedAddress={state.address}
+            handleSubmit={handleShippingAddressTabSubmit}
+          />
+          <PaymentMethodTabPanel
+            selectedPaymentMethod={state.paymentMethod}
+            handleSubmit={handlePaymentMethodTabSubmit}
+            handleGoBack={handleGoBackOneStep}
+          />
+          <PlaceOrderTabPanel
+            items={items}
+            address={state.address}
+            paymentMethod={state.paymentMethod}
+            handleGoBack={handleGoBackOneStep}
+          />
+        </TabPanels>
+      </Tabs>
+    </>
   );
 };
 
