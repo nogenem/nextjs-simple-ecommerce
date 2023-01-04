@@ -1,9 +1,10 @@
 import NextImage from 'next/image';
 
 import { CloseIcon } from '@chakra-ui/icons';
-import { Flex, IconButton, Td, Text, Tr } from '@chakra-ui/react';
+import { Flex, IconButton, Td, Tr } from '@chakra-ui/react';
 
 import { useRemoveItemFromCart } from '~/features/cart/hooks';
+import { TruncatedText } from '~/shared/components';
 import type { RouterOutputs } from '~/shared/utils/trpc';
 
 import { TableItemPriceCell } from './table-item-price-cell';
@@ -56,9 +57,11 @@ const EditableTableItem = ({ item }: Pick<TTableItemProps, 'item'>) => {
           />
         </Flex>
       </Td>
-      <Td>
-        <Text>{variant.product.name}</Text>
-        <Text fontSize="sm">{variantDescription}</Text>
+      <Td maxW="20rem">
+        <TruncatedText truncateAfter="md">{variant.product.name}</TruncatedText>
+        <TruncatedText truncateAfter="md" fontSize="sm">
+          {variantDescription}
+        </TruncatedText>
       </Td>
       <Td>
         <TableItemQuantityCell item={item} isEditable />
@@ -106,9 +109,11 @@ const NonEditableTableItem = ({ item }: Pick<TTableItemProps, 'item'>) => {
           />
         </Flex>
       </Td>
-      <Td>
-        <Text>{variant.product.name}</Text>
-        <Text fontSize="sm">{variantDescription}</Text>
+      <Td maxW="20rem">
+        <TruncatedText truncateAfter="md">{variant.product.name}</TruncatedText>
+        <TruncatedText truncateAfter="md" fontSize="sm">
+          {variantDescription}
+        </TruncatedText>
       </Td>
       <Td>
         <TableItemQuantityCell item={item} />

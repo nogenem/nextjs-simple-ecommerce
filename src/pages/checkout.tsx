@@ -327,8 +327,9 @@ const PlaceOrderTabPanel = ({
         flexDir={{ base: 'column-reverse', lg: 'row' }}
         justifyContent="space-between"
         mb="3"
+        gap={{ base: '5', lg: '3' }}
       >
-        <Stack>
+        <Stack maxW={{ base: '100%', lg: '75%' }}>
           <Card>
             <CardBody>
               <Heading size="md" mb="3">
@@ -359,7 +360,7 @@ const PlaceOrderTabPanel = ({
           </Card>
         </Stack>
 
-        <Box minW="250" mb={{ base: '3', lg: '0' }}>
+        <Box minW="250">
           <Card>
             <CardBody>
               <Stack>

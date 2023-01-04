@@ -5,14 +5,13 @@ import {
   Card,
   CardBody,
   Flex,
-  Heading,
   Link,
   Stack,
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
 
-import { ShimmerImage } from '~/shared/components';
+import { ShimmerImage, TruncatedHeading } from '~/shared/components';
 import { formatPrice } from '~/shared/utils/format-price';
 import { getRandomArbitrary } from '~/shared/utils/get-random-arbitrary';
 import type { RouterOutputs } from '~/shared/utils/trpc';
@@ -110,7 +109,9 @@ const ProductCard = ({ product }: TProductCardProps) => {
               />
             </Box>
             <Stack mt="6" spacing="3">
-              <Heading size="md">{product.name}</Heading>
+              <TruncatedHeading truncateAfter="md" size="md">
+                {product.name}
+              </TruncatedHeading>
               <Flex gap="2" align="center">
                 {priceText}
               </Flex>
