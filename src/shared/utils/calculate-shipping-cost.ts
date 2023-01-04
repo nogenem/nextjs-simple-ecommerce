@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import type { Address } from '../types/globals';
+import type { TAddressSchema } from '../types/globals';
 
 export const calculateShippingCost = (
-  address: Address,
+  address: TAddressSchema,
   cartSubTotal: number,
 ) => {
   // May be calculated somehow

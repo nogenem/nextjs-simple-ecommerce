@@ -1,6 +1,7 @@
 import type { NextPage } from 'next';
 
 import type {
+  Address,
   Attribute,
   Cart,
   CartItem,
@@ -30,12 +31,4 @@ export type TCartItemWithVariant = CartItem & {
     | undefined;
 };
 
-// TODO: Will come from Prisma later
-export type Address = {
-  complement?: string;
-  country: string;
-  postal_code: string;
-  state: string;
-  city: string;
-  street_address: string;
-};
+export type TAddressSchema = Omit<Address, 'id' | 'created_at' | 'updated_at'>;

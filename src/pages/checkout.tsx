@@ -29,6 +29,7 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
+import { PaymentMethod } from '@prisma/client';
 import { z } from 'zod';
 
 import { CartItemsTable } from '~/features/cart/components';
@@ -36,7 +37,10 @@ import { useCartItems } from '~/features/cart/hooks';
 import { calculateCartSubtotal } from '~/features/cart/utils/calculate-cart-subtotal';
 import { hasAnyInvalidItem } from '~/features/cart/utils/has-any-invalid-item';
 import { useObjState } from '~/shared/hooks';
-import type { Address, TCartItemWithVariant } from '~/shared/types/globals';
+import type {
+  TAddressSchema,
+  TCartItemWithVariant,
+} from '~/shared/types/globals';
 import { calculateShippingCost } from '~/shared/utils/calculate-shipping-cost';
 import { formatPrice } from '~/shared/utils/format-price';
 
@@ -46,16 +50,16 @@ const AddressSchema = z.object({
   state: z.string().min(1),
   city: z.string().min(1),
   street_address: z.string().min(1),
-  complement: z.string().optional(),
+  complement: z.string().min(0),
 });
 
-const PaymentMethodSchema = z.enum(['paypal', 'stripe']);
+const PaymentMethodSchema = z.nativeEnum(PaymentMethod);
 
-type PaymentMethod = z.infer<typeof PaymentMethodSchema>;
+type TPaymentMethodSchema = z.infer<typeof PaymentMethodSchema>;
 
 type CheckoutState = {
-  address?: Address;
-  paymentMethod?: PaymentMethod;
+  address?: TAddressSchema;
+  paymentMethod?: TPaymentMethodSchema;
 };
 
 const Checkout: NextPage = () => {
@@ -87,7 +91,7 @@ const Checkout: NextPage = () => {
     );
   }
 
-  const handleShippingAddressTabSubmit = (address: Address) => {
+  const handleShippingAddressTabSubmit = (address: TAddressSchema) => {
     const parsedData = AddressSchema.safeParse(address);
     if (!parsedData.success) {
       toast({
@@ -170,8 +174,8 @@ const ShippingAddressTabPanel = ({
   selectedAddress,
   handleSubmit,
 }: {
-  selectedAddress?: Address;
-  handleSubmit: (address: Address) => void;
+  selectedAddress?: TAddressSchema;
+  handleSubmit: (address: TAddressSchema) => void;
 }) => {
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -181,7 +185,7 @@ const ShippingAddressTabPanel = ({
       e.currentTarget.querySelector<HTMLInputElement>(`input[name="${name}"]`)
         ?.value || '';
 
-    const address: Address = {
+    const address: TAddressSchema = {
       country: getInputValueByName('country'),
       postal_code: getInputValueByName('postal_code'),
       state: getInputValueByName('state'),
@@ -247,7 +251,7 @@ const PaymentMethodTabPanel = ({
   handleSubmit,
   handleGoBack,
 }: {
-  selectedPaymentMethod?: PaymentMethod;
+  selectedPaymentMethod?: TPaymentMethodSchema;
   handleSubmit: (paymentMethod: string) => void;
   handleGoBack: () => void;
 }) => {
@@ -273,10 +277,10 @@ const PaymentMethodTabPanel = ({
             defaultValue={selectedPaymentMethod}
           >
             <Stack>
-              <Radio size="lg" value="paypal">
+              <Radio size="lg" value={PaymentMethod.PAYPAL}>
                 Paypal
               </Radio>
-              <Radio size="lg" value="stripe">
+              <Radio size="lg" value={PaymentMethod.STRIPE}>
                 Stripe
               </Radio>
             </Stack>
@@ -301,7 +305,7 @@ const PlaceOrderTabPanel = ({
   handleGoBack,
 }: {
   items: TCartItemWithVariant[];
-  address?: Address;
+  address?: TAddressSchema;
   paymentMethod?: PaymentMethod;
   handleGoBack: () => void;
 }) => {
@@ -340,7 +344,7 @@ const PlaceOrderTabPanel = ({
                 Payment Method
               </Heading>
               <Text align="start" textTransform="capitalize">
-                {paymentMethod}
+                {paymentMethod.toLocaleLowerCase()}
               </Text>
             </CardBody>
           </Card>
