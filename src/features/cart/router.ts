@@ -15,6 +15,8 @@ import type {
 } from '~/shared/types/globals';
 import type { RouterInputs } from '~/shared/utils/trpc';
 
+import { getLoggedInUserCartItems } from './utils/get-logged-in-user-cart-items';
+
 export const cartRouter = router({
   addItem: publicProcedure
     .input(
@@ -340,40 +342,6 @@ const addItemToGuestUserCart = (
   );
 
   return cartItem;
-};
-
-const getLoggedInUserCartItems = async (userId: string, ctx: Context) => {
-  const items = await ctx.prisma.cartItem.findMany({
-    where: {
-      cart: {
-        userId,
-      },
-    },
-    include: {
-      variant: {
-        include: {
-          attributes: true,
-          images: true,
-          product: {
-            include: {
-              discount: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  const NOW = new Date();
-  return items.map((item) => {
-    if (
-      item.variant?.product.discount &&
-      item.variant.product.discount.valid_until <= NOW
-    ) {
-      item.variant.product.discount = null;
-    }
-    return item;
-  });
 };
 
 const getGuestUserCartItems = async (ctx: Context) => {

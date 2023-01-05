@@ -2,7 +2,6 @@ import type { FormEvent } from 'react';
 import { useEffect, useState } from 'react';
 
 import type { NextPage } from 'next';
-import { signIn, useSession } from 'next-auth/react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
@@ -32,10 +31,12 @@ import {
 import { PaymentMethod } from '@prisma/client';
 import { z } from 'zod';
 
+import { useProtectedRoute } from '~/features/auth/hooks';
 import { CartItemsTable } from '~/features/cart/components';
 import { useCartItems } from '~/features/cart/hooks';
 import { calculateCartSubtotal } from '~/features/cart/utils/calculate-cart-subtotal';
 import { hasAnyInvalidItem } from '~/features/cart/utils/has-any-invalid-item';
+import { usePlaceOrder } from '~/features/orders/hooks';
 import { useObjState } from '~/shared/hooks';
 import type {
   TAddressSchema,
@@ -63,19 +64,15 @@ type CheckoutState = {
 };
 
 const Checkout: NextPage = () => {
-  const { status: sessionStatus } = useSession();
   const toast = useToast();
   const router = useRouter();
 
   const [step, setStep] = useState(1);
   const [state, setState] = useObjState<CheckoutState>({});
   const { items, isLoading: isItemsLoading } = useCartItems();
+  const { mutate: placeOrder, isLoading: isPlacingTheOrder } = usePlaceOrder();
 
-  useEffect(() => {
-    if (sessionStatus === 'unauthenticated') {
-      signIn('google');
-    }
-  }, [sessionStatus]);
+  useProtectedRoute();
 
   useEffect(() => {
     if (!isItemsLoading && (hasAnyInvalidItem(items) || items.length === 0)) {
@@ -129,6 +126,18 @@ const Checkout: NextPage = () => {
     setStep((old) => (old - 1 >= 1 ? old - 1 : old));
   };
 
+  const handlePlaceOrder = () => {
+    const shippingAddress = state.address;
+    const paymentMethod = state.paymentMethod;
+
+    if (!shippingAddress || !paymentMethod) return false;
+
+    placeOrder({
+      shippingAddress,
+      paymentMethod,
+    });
+  };
+
   return (
     <>
       <Head>
@@ -162,6 +171,8 @@ const Checkout: NextPage = () => {
             items={items}
             address={state.address}
             paymentMethod={state.paymentMethod}
+            isPlacingTheOrder={isPlacingTheOrder}
+            handlePlaceOrder={handlePlaceOrder}
             handleGoBack={handleGoBackOneStep}
           />
         </TabPanels>
@@ -302,11 +313,15 @@ const PlaceOrderTabPanel = ({
   items,
   address,
   paymentMethod,
+  isPlacingTheOrder,
+  handlePlaceOrder,
   handleGoBack,
 }: {
   items: TCartItemWithVariant[];
   address?: TAddressSchema;
   paymentMethod?: PaymentMethod;
+  isPlacingTheOrder: boolean;
+  handlePlaceOrder: () => void;
   handleGoBack: () => void;
 }) => {
   if (!address || !paymentMethod) return null;
@@ -379,7 +394,14 @@ const PlaceOrderTabPanel = ({
                   <Text>Total</Text>
                   <Text>{formatPrice(cartTotalPrice)}</Text>
                 </HStack>
-                <Button colorScheme="primary">Place Order</Button>
+                <Button
+                  colorScheme="primary"
+                  onClick={() => handlePlaceOrder()}
+                  isLoading={isPlacingTheOrder}
+                  isDisabled={!address || !paymentMethod}
+                >
+                  Place Order
+                </Button>
               </Stack>
             </CardBody>
           </Card>
