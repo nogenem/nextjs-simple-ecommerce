@@ -90,4 +90,36 @@ export const ordersRouter = router({
 
       return order;
     }),
+  byId: protectedProcedure
+    .input(
+      z.object({
+        orderId: z.string().min(1),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      return ctx.prisma.order.findFirst({
+        where: {
+          id: input.orderId,
+        },
+        include: {
+          paymentDetail: true,
+          shippingAddress: true,
+          items: {
+            include: {
+              variant: {
+                include: {
+                  attributes: true,
+                  images: true,
+                  product: {
+                    include: {
+                      discount: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+    }),
 });
