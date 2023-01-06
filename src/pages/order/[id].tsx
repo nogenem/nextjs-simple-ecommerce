@@ -34,7 +34,11 @@ import { z } from 'zod';
 
 import { useProtectedRoute } from '~/features/auth/hooks';
 import { OrderItemsTable } from '~/features/orders/components';
-import { useOrderById } from '~/features/orders/hooks';
+import {
+  useOrderById,
+  useUpdateShippingAddress,
+} from '~/features/orders/hooks';
+import { canEditOrderShippingAddressOrPaymentMethod } from '~/features/orders/utils/can-edit-order-shipping-address-or-payment-method';
 import type { TAddressSchema } from '~/shared/types/globals';
 import { formatPrice } from '~/shared/utils/format-price';
 import type { RouterOutputs } from '~/shared/utils/trpc';
@@ -60,6 +64,10 @@ const Order = () => {
     : router.query.id;
 
   const { order, isLoading: isOrderLoading } = useOrderById(orderId);
+  const {
+    mutateAsync: updateShippingAddress,
+    isLoading: isUpdatingShippingAddress,
+  } = useUpdateShippingAddress();
   const [step, setStep] = useState(2);
 
   useProtectedRoute();
@@ -83,7 +91,7 @@ const Order = () => {
     );
   }
 
-  const handleShippingAddressTabSubmit = (address: TAddressSchema) => {
+  const handleShippingAddressTabSubmit = async (address: TAddressSchema) => {
     if (canEditOrderShippingAddressOrPaymentMethod(order)) {
       const parsedData = AddressSchema.safeParse(address);
       if (!parsedData.success) {
@@ -94,8 +102,15 @@ const Order = () => {
           duration: 5000,
         });
       } else {
-        // TODO: Update on the database
-        setStep(2);
+        try {
+          await updateShippingAddress({
+            orderId: order.id,
+            shippingAddress: address,
+          });
+          setStep(2);
+        } catch (err) {
+          //
+        }
       }
     } else {
       setStep(2);
@@ -141,6 +156,7 @@ const Order = () => {
         <TabPanels maxW="65rem">
           <ShippingAddressTabPanel
             selectedAddress={order.shippingAddress}
+            isUpdatingShippingAddress={isUpdatingShippingAddress}
             handleSubmit={handleShippingAddressTabSubmit}
           />
           <PaymentMethodTabPanel
@@ -160,14 +176,18 @@ const Order = () => {
 
 const ShippingAddressTabPanel = ({
   selectedAddress,
+  isUpdatingShippingAddress,
   handleSubmit,
 }: {
   selectedAddress?: TAddressSchema;
+  isUpdatingShippingAddress: boolean;
   handleSubmit: (address: TAddressSchema) => void;
 }) => {
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (isUpdatingShippingAddress) return false;
 
     const getInputValueByName = (name: string) =>
       e.currentTarget.querySelector<HTMLInputElement>(`input[name="${name}"]`)
@@ -225,7 +245,11 @@ const ShippingAddressTabPanel = ({
         </FormControl>
 
         <Flex flexDirection="row-reverse">
-          <Button type="submit" colorScheme="primary">
+          <Button
+            type="submit"
+            colorScheme="primary"
+            isLoading={isUpdatingShippingAddress}
+          >
             Update
           </Button>
         </Flex>
@@ -384,9 +408,5 @@ const OrderDetailsTabPanel = ({
     </TabPanel>
   );
 };
-
-const canEditOrderShippingAddressOrPaymentMethod = (
-  order: NonNullable<RouterOutputs['orders']['byId']>,
-) => !order.paidAt && !order.paymentDetail.paymentMethodId;
 
 export default Order;

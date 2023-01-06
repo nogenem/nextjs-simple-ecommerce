@@ -13,6 +13,7 @@ import { calculateShippingCost } from '~/shared/utils/calculate-shipping-cost';
 import { calculateCartSubtotal } from '../cart/utils/calculate-cart-subtotal';
 import { getLoggedInUserCartItems } from '../cart/utils/get-logged-in-user-cart-items';
 import { hasAnyInvalidItem } from '../cart/utils/has-any-invalid-item';
+import { canEditOrderShippingAddressOrPaymentMethod } from './utils/can-edit-order-shipping-address-or-payment-method';
 
 export const ordersRouter = router({
   placeOrder: protectedProcedure
@@ -117,6 +118,60 @@ export const ordersRouter = router({
                   },
                 },
               },
+            },
+          },
+        },
+      });
+    }),
+  updateShippingAddress: protectedProcedure
+    .input(
+      z.object({
+        orderId: z.string().min(1),
+        shippingAddress: z.object({
+          country: z.string().min(1),
+          postal_code: z.string().min(1),
+          state: z.string().min(1),
+          city: z.string().min(1),
+          street_address: z.string().min(1),
+          complement: z.string().min(0),
+        }),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = ctx.session.user;
+
+      const order = await ctx.prisma.order.findFirst({
+        where: {
+          id: input.orderId,
+          userId: user.id,
+        },
+        include: {
+          paymentDetail: true,
+        },
+      });
+
+      if (!order) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Order not found.',
+        });
+      }
+
+      if (!canEditOrderShippingAddressOrPaymentMethod(order)) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: "Order shipping address can't be edited.",
+        });
+      }
+
+      return ctx.prisma.order.update({
+        where: {
+          id: input.orderId,
+        },
+        data: {
+          shippingAddress: {
+            update: {
+              ...input.shippingAddress,
             },
           },
         },
