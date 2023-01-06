@@ -38,6 +38,7 @@ import {
   useOrderById,
   useUpdateShippingAddress,
 } from '~/features/orders/hooks';
+import { useUpdatePaymentMethod } from '~/features/orders/hooks/use-update-payment-method';
 import { canEditOrderShippingAddressOrPaymentMethod } from '~/features/orders/utils/can-edit-order-shipping-address-or-payment-method';
 import type { TAddressSchema } from '~/shared/types/globals';
 import { formatPrice } from '~/shared/utils/format-price';
@@ -68,6 +69,10 @@ const Order = () => {
     mutateAsync: updateShippingAddress,
     isLoading: isUpdatingShippingAddress,
   } = useUpdateShippingAddress();
+  const {
+    mutateAsync: updatePaymentMethod,
+    isLoading: isUpdatingPaymentMethod,
+  } = useUpdatePaymentMethod();
   const [step, setStep] = useState(2);
 
   useProtectedRoute();
@@ -117,7 +122,7 @@ const Order = () => {
     }
   };
 
-  const handlePaymentMethodTabSubmit = (paymentMethod: string) => {
+  const handlePaymentMethodTabSubmit = async (paymentMethod: string) => {
     if (canEditOrderShippingAddressOrPaymentMethod(order)) {
       const parsedData = PaymentMethodSchema.safeParse(paymentMethod);
       if (!parsedData.success) {
@@ -128,8 +133,15 @@ const Order = () => {
           duration: 5000,
         });
       } else {
-        // TODO: Update on the database
-        setStep(2);
+        try {
+          await updatePaymentMethod({
+            orderId: order.id,
+            paymentMethod: parsedData.data,
+          });
+          setStep(2);
+        } catch (err) {
+          //
+        }
       }
     } else {
       setStep(2);
@@ -166,6 +178,7 @@ const Order = () => {
           />
           <PaymentMethodTabPanel
             selectedPaymentMethod={order.paymentDetail.paymentMethod}
+            isUpdatingPaymentMethod={isUpdatingPaymentMethod}
             handleSubmit={handlePaymentMethodTabSubmit}
             handleCancel={handleCancelUpdate}
           />
@@ -271,10 +284,12 @@ const ShippingAddressTabPanel = ({
 
 const PaymentMethodTabPanel = ({
   selectedPaymentMethod,
+  isUpdatingPaymentMethod,
   handleSubmit,
   handleCancel,
 }: {
   selectedPaymentMethod?: TPaymentMethodSchema;
+  isUpdatingPaymentMethod: boolean;
   handleSubmit: (paymentMethod: string) => void;
   handleCancel: () => void;
 }) => {
@@ -311,10 +326,16 @@ const PaymentMethodTabPanel = ({
         </FormControl>
 
         <Flex flexDirection="row-reverse" gap="3">
-          <Button type="submit" colorScheme="primary">
+          <Button
+            type="submit"
+            colorScheme="primary"
+            isLoading={isUpdatingPaymentMethod}
+          >
             Update
           </Button>
-          <Button onClick={handleCancel}>Cancel</Button>
+          <Button onClick={handleCancel} isLoading={isUpdatingPaymentMethod}>
+            Cancel
+          </Button>
         </Flex>
       </form>
     </TabPanel>

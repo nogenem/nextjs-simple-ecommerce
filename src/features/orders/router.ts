@@ -177,4 +177,51 @@ export const ordersRouter = router({
         },
       });
     }),
+  updatePaymentMethod: protectedProcedure
+    .input(
+      z.object({
+        orderId: z.string().min(1),
+        paymentMethod: z.nativeEnum(PaymentMethod),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = ctx.session.user;
+
+      const order = await ctx.prisma.order.findFirst({
+        where: {
+          id: input.orderId,
+          userId: user.id,
+        },
+        include: {
+          paymentDetail: true,
+        },
+      });
+
+      if (!order) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Order not found.',
+        });
+      }
+
+      if (!canEditOrderShippingAddressOrPaymentMethod(order)) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: "Order payment method can't be edited.",
+        });
+      }
+
+      return ctx.prisma.order.update({
+        where: {
+          id: input.orderId,
+        },
+        data: {
+          paymentDetail: {
+            update: {
+              paymentMethod: input.paymentMethod,
+            },
+          },
+        },
+      });
+    }),
 });
