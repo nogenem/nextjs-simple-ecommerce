@@ -164,11 +164,19 @@ export const ordersRouter = router({
         });
       }
 
+      const newShippingCost = calculateShippingCost(
+        input.shippingAddress,
+        order.itemsSubtotal,
+      );
+      const newTotalPrice = order.itemsSubtotal + newShippingCost;
+
       return ctx.prisma.order.update({
         where: {
           id: input.orderId,
         },
         data: {
+          shippingCost: newShippingCost,
+          totalPrice: newTotalPrice,
           shippingAddress: {
             update: {
               ...input.shippingAddress,
