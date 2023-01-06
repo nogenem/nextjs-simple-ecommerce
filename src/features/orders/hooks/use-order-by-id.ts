@@ -10,6 +10,6 @@ export const useOrderById = (orderId = '') => {
 
   return {
     order: query.data,
-    isLoading: query.isLoading,
+    isOrderLoading: query.isLoading,
   };
 };

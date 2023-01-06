@@ -8,6 +8,6 @@ export const useCartItems = () => {
 
   return {
     items: query.data || EMPTY_ARRAY,
-    isLoading: query.isLoading,
+    areTheItemsLoading: query.isLoading,
   };
 };

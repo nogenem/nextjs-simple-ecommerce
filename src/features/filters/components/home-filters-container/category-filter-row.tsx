@@ -10,7 +10,7 @@ import type { RouterOutputs } from '~/shared/utils/trpc';
 import { FilterRowHeader } from './filter-row-header';
 
 const CategoryFilterRow = () => {
-  const { categories, isLoading } = useCategories();
+  const { categories, areTheCategoriesLoading } = useCategories();
 
   return (
     <Flex w="100%" direction="column">
@@ -18,7 +18,7 @@ const CategoryFilterRow = () => {
         label="Categories"
         queryParamKeys={[URL_QUERY_KEYS.CATEGORY_ID]}
       />
-      {isLoading && <Box>Loading...</Box>}
+      {areTheCategoriesLoading && <Box>Loading...</Box>}
       <Flex direction="column" gap="2" maxH="250" overflowY="auto">
         {categories.map((category) => (
           <CategoryFilterItem key={category.id} category={category} />

@@ -11,9 +11,10 @@ import type { RouterOutputs } from '~/shared/utils/trpc';
 import { FilterRowHeader } from './filter-row-header';
 
 const SizeFilterRow = () => {
-  const { attributes: sizes, isLoading } = useAttributes({
-    type: AttributeType.Size,
-  });
+  const { attributes: sizes, areTheAttributesLoading: areTheSizesLoading } =
+    useAttributes({
+      type: AttributeType.Size,
+    });
 
   return (
     <Flex w="100%" direction="column">
@@ -21,7 +22,7 @@ const SizeFilterRow = () => {
         label="Sizes"
         queryParamKeys={[URL_QUERY_KEYS.SIZE_ID]}
       />
-      {isLoading && <Box>Loading...</Box>}
+      {areTheSizesLoading && <Box>Loading...</Box>}
       <Flex direction="column" gap="2" maxH="250" overflowY="auto">
         {sizes.map((size) => (
           <SizeFilterItem key={size.id} size={size} />

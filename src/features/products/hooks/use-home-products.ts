@@ -10,6 +10,6 @@ export const useHomeProducts = () => {
 
   return {
     products: query.data || EMPTY_ARRAY,
-    isLoading: query.isLoading,
+    areTheHomeProductsLoading: query.isLoading,
   };
 };

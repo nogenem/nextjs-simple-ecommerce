@@ -29,7 +29,7 @@ export const useAddItemToCart = () => {
   });
 
   return {
-    mutate: mutation.mutate,
-    isLoading: mutation.isLoading,
+    addItemToCart: mutation.mutate,
+    isAddingItemToCart: mutation.isLoading,
   };
 };

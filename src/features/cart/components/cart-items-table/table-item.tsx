@@ -26,7 +26,7 @@ const TableItem = ({ item, isEditable = false }: TTableItemProps) => {
 };
 
 const EditableTableItem = ({ item }: Pick<TTableItemProps, 'item'>) => {
-  const { mutate: removeItemFromCart, isLoading: isRemovingItemFromCart } =
+  const { removeItemFromCart, isRemovingItemFromCart } =
     useRemoveItemFromCart();
 
   const variant = item.variant;

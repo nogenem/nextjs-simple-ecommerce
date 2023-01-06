@@ -29,8 +29,7 @@ export const useUpdateShippingAddress = () => {
   });
 
   return {
-    mutate: mutation.mutate,
-    mutateAsync: mutation.mutateAsync,
-    isLoading: mutation.isLoading,
+    updateShippingAddressAsync: mutation.mutateAsync,
+    isUpdatingShippingAddress: mutation.isLoading,
   };
 };

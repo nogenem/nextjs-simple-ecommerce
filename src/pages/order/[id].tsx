@@ -64,15 +64,11 @@ const Order = () => {
     ? router.query.id[0]
     : router.query.id;
 
-  const { order, isLoading: isOrderLoading } = useOrderById(orderId);
-  const {
-    mutateAsync: updateShippingAddress,
-    isLoading: isUpdatingShippingAddress,
-  } = useUpdateShippingAddress();
-  const {
-    mutateAsync: updatePaymentMethod,
-    isLoading: isUpdatingPaymentMethod,
-  } = useUpdatePaymentMethod();
+  const { order, isOrderLoading } = useOrderById(orderId);
+  const { updateShippingAddressAsync, isUpdatingShippingAddress } =
+    useUpdateShippingAddress();
+  const { updatePaymentMethodAsync, isUpdatingPaymentMethod } =
+    useUpdatePaymentMethod();
   const [step, setStep] = useState(2);
 
   useProtectedRoute();
@@ -108,7 +104,7 @@ const Order = () => {
         });
       } else {
         try {
-          await updateShippingAddress({
+          await updateShippingAddressAsync({
             orderId: order.id,
             shippingAddress: address,
           });
@@ -134,7 +130,7 @@ const Order = () => {
         });
       } else {
         try {
-          await updatePaymentMethod({
+          await updatePaymentMethodAsync({
             orderId: order.id,
             paymentMethod: parsedData.data,
           });

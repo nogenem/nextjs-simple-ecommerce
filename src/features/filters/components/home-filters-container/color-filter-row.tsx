@@ -8,9 +8,10 @@ import { ColorFilterItem } from '~/shared/components';
 import { FilterRowHeader } from './filter-row-header';
 
 const ColorFilterRow = () => {
-  const { attributes: colors, isLoading } = useAttributes({
-    type: AttributeType.Color,
-  });
+  const { attributes: colors, areTheAttributesLoading: areTheColorsLoading } =
+    useAttributes({
+      type: AttributeType.Color,
+    });
 
   return (
     <Flex w="100%" direction="column">
@@ -18,7 +19,7 @@ const ColorFilterRow = () => {
         label="Colors"
         queryParamKeys={[URL_QUERY_KEYS.COLOR_ID]}
       />
-      {isLoading && <Box>Loading...</Box>}
+      {areTheColorsLoading && <Box>Loading...</Box>}
       <Flex direction="row" gap="2">
         {colors.map((color) => (
           <ColorFilterItem key={color.id} color={color} />

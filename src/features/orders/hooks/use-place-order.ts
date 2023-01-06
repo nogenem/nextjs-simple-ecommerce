@@ -27,7 +27,7 @@ export const usePlaceOrder = () => {
   });
 
   return {
-    mutate: mutation.mutate,
-    isLoading: mutation.isLoading,
+    placeOrder: mutation.mutate,
+    isPlacingTheOrder: mutation.isLoading,
   };
 };

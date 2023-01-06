@@ -52,13 +52,12 @@ const Product = () => {
     : router.query.slug;
 
   const filters = useFilters();
-  const { product, isLoading: isProductInfoLoading } = useProductBySlug(slug);
+  const { product, isProductLoading } = useProductBySlug(slug);
   const variant = useProductVariantByFilters(product);
   const { count: countCartItemsByProductId } = useCountCartItemsByProductId(
     product?.id,
   );
-  const { mutate: addItemToCart, isLoading: isAddingItemToCart } =
-    useAddItemToCart();
+  const { addItemToCart, isAddingItemToCart } = useAddItemToCart();
   const [imageIdx, setImageIdx] = useState(0);
   const [quantityToAdd, setQuantityToAdd] = useState(1);
 
@@ -74,7 +73,7 @@ const Product = () => {
   const discountedPriceTextColor = useColorModeValue('gray.600', 'gray.300');
   const soldOutTextColor = useColorModeValue('red.600', 'red.300');
 
-  if (isProductInfoLoading || variant === undefined) {
+  if (isProductLoading || variant === undefined) {
     return (
       <Flex w="100%" alignItems="center" justifyContent="center">
         <CircularProgress isIndeterminate color="primary.300" />

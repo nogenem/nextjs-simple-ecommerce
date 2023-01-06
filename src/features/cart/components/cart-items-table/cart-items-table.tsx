@@ -32,7 +32,7 @@ const CartItemsTable = ({
 
   const primaryColor = useColorModeValue('primary.500', 'primary.300');
 
-  const { items, isLoading } = useCartItems();
+  const { items, areTheItemsLoading } = useCartItems();
 
   useHorizontalScroll(tableContainerRef);
 
@@ -51,7 +51,7 @@ const CartItemsTable = ({
           </Tr>
         </Thead>
         <Tbody>
-          {isLoading && (
+          {areTheItemsLoading && (
             <Tr>
               <Td colSpan={isEditable ? 5 : 4}>Loading...</Td>
             </Tr>

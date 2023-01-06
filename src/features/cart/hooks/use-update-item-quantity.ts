@@ -29,9 +29,9 @@ export const useUpdateItemQuantity = () => {
   });
 
   return {
-    mutate: mutation.mutate,
-    isLoading: mutation.isLoading,
-    isError: mutation.isError,
-    lastValuesUsed: mutation.variables,
+    updateItemQuantity: mutation.mutate,
+    isUpdatingItemQuantity: mutation.isLoading,
+    gotAnErrorWhileUpdatingItemQuantity: mutation.isError,
+    lastValuesUsedToUpdateItemQuantity: mutation.variables,
   };
 };

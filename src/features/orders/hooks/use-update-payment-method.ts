@@ -29,8 +29,7 @@ export const useUpdatePaymentMethod = () => {
   });
 
   return {
-    mutate: mutation.mutate,
-    mutateAsync: mutation.mutateAsync,
-    isLoading: mutation.isLoading,
+    updatePaymentMethodAsync: mutation.mutateAsync,
+    isUpdatingPaymentMethod: mutation.isLoading,
   };
 };

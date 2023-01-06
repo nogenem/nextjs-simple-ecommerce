@@ -8,6 +8,6 @@ export const useCategories = () => {
 
   return {
     categories: query.data || EMPTY_ARRAY,
-    isLoading: query.isLoading,
+    areTheCategoriesLoading: query.isLoading,
   };
 };

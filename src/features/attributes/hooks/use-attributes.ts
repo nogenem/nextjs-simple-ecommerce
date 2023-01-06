@@ -8,6 +8,6 @@ export const useAttributes = (filters: RouterInputs['attributes']['all']) => {
 
   return {
     attributes: query.data || EMPTY_ARRAY,
-    isLoading: query.isLoading,
+    areTheAttributesLoading: query.isLoading,
   };
 };

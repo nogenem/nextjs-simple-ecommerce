@@ -10,6 +10,6 @@ export const useProductBySlug = (slug = '') => {
 
   return {
     product: query.data,
-    isLoading: query.isLoading,
+    isProductLoading: query.isLoading,
   };
 };

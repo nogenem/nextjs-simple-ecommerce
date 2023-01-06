@@ -9,7 +9,7 @@ import { ProductCard } from '~/features/products/components';
 import { useHomeProducts } from '~/features/products/hooks';
 
 const Home: NextPage = () => {
-  const { products, isLoading } = useHomeProducts();
+  const { products, areTheHomeProductsLoading } = useHomeProducts();
 
   useFiltersSync();
 
@@ -29,12 +29,12 @@ const Home: NextPage = () => {
           justify={{ base: 'center', md: 'flex-start' }}
           gap="3"
         >
-          {isLoading && (
+          {areTheHomeProductsLoading && (
             <Box w="100%">
               <Text fontSize="xl">Loading...</Text>
             </Box>
           )}
-          {!isLoading && products.length === 0 && (
+          {!areTheHomeProductsLoading && products.length === 0 && (
             <Box w="100%">
               <Text fontSize="xl">No product found</Text>
             </Box>

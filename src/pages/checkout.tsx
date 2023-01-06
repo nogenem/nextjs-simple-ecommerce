@@ -69,18 +69,21 @@ const Checkout: NextPage = () => {
 
   const [step, setStep] = useState(1);
   const [state, setState] = useObjState<CheckoutState>({});
-  const { items, isLoading: isItemsLoading } = useCartItems();
-  const { mutate: placeOrder, isLoading: isPlacingTheOrder } = usePlaceOrder();
+  const { items, areTheItemsLoading } = useCartItems();
+  const { placeOrder, isPlacingTheOrder } = usePlaceOrder();
 
   useProtectedRoute();
 
   useEffect(() => {
-    if (!isItemsLoading && (hasAnyInvalidItem(items) || items.length === 0)) {
+    if (
+      !areTheItemsLoading &&
+      (hasAnyInvalidItem(items) || items.length === 0)
+    ) {
       router.push('/');
     }
-  }, [items, isItemsLoading, router]);
+  }, [items, areTheItemsLoading, router]);
 
-  if (isItemsLoading) {
+  if (areTheItemsLoading) {
     return (
       <Flex w="100%" alignItems="center" justifyContent="center">
         <CircularProgress isIndeterminate color="primary.300" />

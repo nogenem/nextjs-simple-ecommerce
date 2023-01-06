@@ -35,10 +35,10 @@ const EditableTableItemQuantityCell = ({
   item,
 }: Pick<TTableItemQuantityCellProps, 'item'>) => {
   const {
-    mutate: updateItemQuantity,
-    isLoading: isUpdatingItemQuantity,
-    isError: gotAnErrorWhileUpdatingItemQuantity,
-    lastValuesUsed,
+    updateItemQuantity,
+    isUpdatingItemQuantity,
+    gotAnErrorWhileUpdatingItemQuantity,
+    lastValuesUsedToUpdateItemQuantity,
   } = useUpdateItemQuantity();
 
   const handleQuantityChange = useDebouncedCallback(
@@ -64,8 +64,9 @@ const EditableTableItemQuantityCell = ({
   const quantityErrorTooltipLabel =
     variant.quantity_in_stock < item.quantity ||
     (gotAnErrorWhileUpdatingItemQuantity &&
-      !!lastValuesUsed &&
-      variant.quantity_in_stock < lastValuesUsed.newQuantity)
+      !!lastValuesUsedToUpdateItemQuantity &&
+      variant.quantity_in_stock <
+        lastValuesUsedToUpdateItemQuantity.newQuantity)
       ? getOutOfStockLabelText(variant.quantity_in_stock)
       : '';
 
