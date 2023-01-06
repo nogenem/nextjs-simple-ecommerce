@@ -136,6 +136,10 @@ const Order = () => {
     }
   };
 
+  const handleCancelUpdate = () => {
+    setStep(2);
+  };
+
   return (
     <>
       <Head>
@@ -158,10 +162,12 @@ const Order = () => {
             selectedAddress={order.shippingAddress}
             isUpdatingShippingAddress={isUpdatingShippingAddress}
             handleSubmit={handleShippingAddressTabSubmit}
+            handleCancel={handleCancelUpdate}
           />
           <PaymentMethodTabPanel
             selectedPaymentMethod={order.paymentDetail.paymentMethod}
             handleSubmit={handlePaymentMethodTabSubmit}
+            handleCancel={handleCancelUpdate}
           />
           <OrderDetailsTabPanel
             order={order}
@@ -178,10 +184,12 @@ const ShippingAddressTabPanel = ({
   selectedAddress,
   isUpdatingShippingAddress,
   handleSubmit,
+  handleCancel,
 }: {
   selectedAddress?: TAddressSchema;
   isUpdatingShippingAddress: boolean;
   handleSubmit: (address: TAddressSchema) => void;
+  handleCancel: () => void;
 }) => {
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -244,13 +252,16 @@ const ShippingAddressTabPanel = ({
           />
         </FormControl>
 
-        <Flex flexDirection="row-reverse">
+        <Flex flexDirection="row-reverse" gap="3">
           <Button
             type="submit"
             colorScheme="primary"
             isLoading={isUpdatingShippingAddress}
           >
             Update
+          </Button>
+          <Button onClick={handleCancel} isLoading={isUpdatingShippingAddress}>
+            Cancel
           </Button>
         </Flex>
       </form>
@@ -261,9 +272,11 @@ const ShippingAddressTabPanel = ({
 const PaymentMethodTabPanel = ({
   selectedPaymentMethod,
   handleSubmit,
+  handleCancel,
 }: {
   selectedPaymentMethod?: TPaymentMethodSchema;
   handleSubmit: (paymentMethod: string) => void;
+  handleCancel: () => void;
 }) => {
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -301,6 +314,7 @@ const PaymentMethodTabPanel = ({
           <Button type="submit" colorScheme="primary">
             Update
           </Button>
+          <Button onClick={handleCancel}>Cancel</Button>
         </Flex>
       </form>
     </TabPanel>
