@@ -16,6 +16,8 @@ import { formatPrice } from '~/shared/utils/format-price';
 import { getRandomArbitrary } from '~/shared/utils/get-random-arbitrary';
 import type { RouterOutputs } from '~/shared/utils/trpc';
 
+import { getProductUrl } from '../utils/get-product-url';
+
 type TProductCardProps = {
   product: RouterOutputs['products']['home'][number];
 };
@@ -48,10 +50,6 @@ const ProductCard = ({ product }: TProductCardProps) => {
     product.discount?.percent,
   );
 
-  const query = variant.attributes
-    .map((attr) => `${attr.type.toLowerCase()}_id=${attr.id}`)
-    .join('&');
-
   let priceText = (
     <>
       <Text color={priceTextColor} fontSize="2xl">
@@ -77,7 +75,11 @@ const ProductCard = ({ product }: TProductCardProps) => {
   }
 
   return (
-    <NextLink href={`/p/${product.slug}?${query}`} passHref legacyBehavior>
+    <NextLink
+      href={getProductUrl(product.slug, variant.attributes)}
+      passHref
+      legacyBehavior
+    >
       <Link textDecoration="none !important" target="_blank">
         <Card
           maxW="300"

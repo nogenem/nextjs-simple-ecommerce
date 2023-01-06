@@ -1,9 +1,11 @@
 import NextImage from 'next/image';
+import Link from 'next/link';
 
 import { CloseIcon } from '@chakra-ui/icons';
 import { Flex, IconButton, Td, Tr } from '@chakra-ui/react';
 
 import { useRemoveItemFromCart } from '~/features/cart/hooks';
+import { getProductUrl } from '~/features/products/utils/get-product-url';
 import { TruncatedText } from '~/shared/components';
 import type { RouterOutputs } from '~/shared/utils/trpc';
 
@@ -44,17 +46,31 @@ const EditableTableItem = ({ item }: Pick<TTableItemProps, 'item'>) => {
     removeItemFromCart({ itemId: item.id });
   };
 
+  let VariantImage = (
+    <NextImage
+      src={variant.images[0]?.url || ''}
+      alt={variant.images[0]?.alternative_text || ''}
+      width={IMAGE_SIZE}
+      height={IMAGE_SIZE}
+      style={{ maxWidth: 'unset' }}
+    />
+  );
+  if (variant.available_for_sale) {
+    VariantImage = (
+      <Link
+        href={getProductUrl(variant.product.slug, variant.attributes)}
+        target="_blank"
+      >
+        {VariantImage}
+      </Link>
+    );
+  }
+
   return (
     <Tr>
       <Td>
         <Flex w="100%" justifyContent="center">
-          <NextImage
-            src={variant.images[0]?.url || ''}
-            alt={variant.images[0]?.alternative_text || ''}
-            width={IMAGE_SIZE}
-            height={IMAGE_SIZE}
-            style={{ maxWidth: 'unset' }}
-          />
+          {VariantImage}
         </Flex>
       </Td>
       <Td maxW="20rem">
