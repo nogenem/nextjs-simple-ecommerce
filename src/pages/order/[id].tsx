@@ -33,6 +33,7 @@ import { PaymentMethod } from '@prisma/client';
 import { z } from 'zod';
 
 import { useProtectedRoute } from '~/features/auth/hooks';
+import { OrderItemsTable } from '~/features/orders/components';
 import { useOrderById } from '~/features/orders/hooks';
 import type { TAddressSchema } from '~/shared/types/globals';
 import { formatPrice } from '~/shared/utils/format-price';
@@ -349,7 +350,7 @@ const OrderDetailsTabPanel = ({
               <Heading size="md" mb="3">
                 Order Items
               </Heading>
-              {/* TODO: Show the items table */}
+              <OrderItemsTable items={order.items} />
             </CardBody>
           </Card>
         </Stack>
