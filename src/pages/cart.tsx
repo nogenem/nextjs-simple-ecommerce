@@ -42,14 +42,7 @@ const Cart: NextPage = () => {
 
   return (
     <>
-      <Head>
-        <title>Simple ECommerce - Cart</title>
-        <meta
-          name="description"
-          content="The cart page of this simple ecommerce"
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <PageHead />
       <Flex
         w="100%"
         maxW="1000"
@@ -80,6 +73,19 @@ const Cart: NextPage = () => {
         </Flex>
       </Flex>
     </>
+  );
+};
+
+const PageHead = () => {
+  const title = 'Cart page | ECommerce';
+  const description = 'View all items in your cart on ECommerce.';
+  return (
+    <Head>
+      <title>{title}</title>
+      <meta name="title" content={title} />
+      <meta name="description" content={description} />
+      <link rel="icon" href="/favicon.ico" />
+    </Head>
   );
 };
 

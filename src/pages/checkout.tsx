@@ -10,7 +10,6 @@ import {
   Button,
   Card,
   CardBody,
-  CircularProgress,
   Flex,
   FormControl,
   FormLabel,
@@ -37,6 +36,7 @@ import { useCartItems } from '~/features/cart/hooks';
 import { calculateCartSubtotal } from '~/features/cart/utils/calculate-cart-subtotal';
 import { hasAnyInvalidItem } from '~/features/cart/utils/has-any-invalid-item';
 import { usePlaceOrder } from '~/features/orders/hooks';
+import { CenteredLoadingIndicator } from '~/shared/components';
 import { useObjState } from '~/shared/hooks';
 import type {
   TAddressSchema,
@@ -63,7 +63,7 @@ type CheckoutState = {
   paymentMethod?: TPaymentMethodSchema;
 };
 
-const Checkout: NextPage = () => {
+const CheckoutPage: NextPage = () => {
   const toast = useToast();
   const router = useRouter();
 
@@ -85,9 +85,10 @@ const Checkout: NextPage = () => {
 
   if (areTheItemsLoading) {
     return (
-      <Flex w="100%" alignItems="center" justifyContent="center">
-        <CircularProgress isIndeterminate color="primary.300" />
-      </Flex>
+      <>
+        <PageHead />
+        <CenteredLoadingIndicator />
+      </>
     );
   }
 
@@ -143,14 +144,7 @@ const Checkout: NextPage = () => {
 
   return (
     <>
-      <Head>
-        <title>Simple ECommerce - Checkout</title>
-        <meta
-          name="description"
-          content="The checkout page of this simple ecommerce"
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <PageHead />
       <Tabs align="center" isLazy index={step} onChange={setStep}>
         <TabList>
           <Tab isDisabled>User Login</Tab>
@@ -181,6 +175,20 @@ const Checkout: NextPage = () => {
         </TabPanels>
       </Tabs>
     </>
+  );
+};
+
+const PageHead = () => {
+  const title = 'Checkout page | ECommerce';
+  const description =
+    'View all details of your purcharge and make the checkout on ECommerce.';
+  return (
+    <Head>
+      <title>{title}</title>
+      <meta name="title" content={title} />
+      <meta name="description" content={description} />
+      <link rel="icon" href="/favicon.ico" />
+    </Head>
   );
 };
 
@@ -417,4 +425,4 @@ const PlaceOrderTabPanel = ({
   );
 };
 
-export default Checkout;
+export default CheckoutPage;

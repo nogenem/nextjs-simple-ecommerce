@@ -1,17 +1,15 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 
+import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 import {
-  Alert,
-  AlertIcon,
   Box,
   Button,
   Card,
   CardBody,
-  CircularProgress,
   Flex,
   FormControl,
   FormLabel,
@@ -40,6 +38,7 @@ import {
 } from '~/features/orders/hooks';
 import { useUpdatePaymentMethod } from '~/features/orders/hooks/use-update-payment-method';
 import { canEditOrderShippingAddressOrPaymentMethod } from '~/features/orders/utils/can-edit-order-shipping-address-or-payment-method';
+import { CenteredAlert, CenteredLoadingIndicator } from '~/shared/components';
 import type { TAddressSchema } from '~/shared/types/globals';
 import { formatPrice } from '~/shared/utils/format-price';
 import type { RouterOutputs } from '~/shared/utils/trpc';
@@ -57,9 +56,10 @@ const PaymentMethodSchema = z.nativeEnum(PaymentMethod);
 
 type TPaymentMethodSchema = z.infer<typeof PaymentMethodSchema>;
 
-const Order = () => {
+const OrderPage: NextPage = () => {
   const toast = useToast();
   const router = useRouter();
+
   const orderId = Array.isArray(router.query.id)
     ? router.query.id[0]
     : router.query.id;
@@ -75,20 +75,19 @@ const Order = () => {
 
   if (isOrderLoading) {
     return (
-      <Flex w="100%" alignItems="center" justifyContent="center">
-        <CircularProgress isIndeterminate color="primary.300" />
-      </Flex>
+      <>
+        <PageHead />
+        <CenteredLoadingIndicator />
+      </>
     );
   }
 
   if (!order) {
     return (
-      <Flex w="100%" alignItems="center" justifyContent="center">
-        <Alert status="error">
-          <AlertIcon />
-          Order not found
-        </Alert>
-      </Flex>
+      <>
+        <PageHead />
+        <CenteredAlert>Order not found</CenteredAlert>
+      </>
     );
   }
 
@@ -150,14 +149,7 @@ const Order = () => {
 
   return (
     <>
-      <Head>
-        <title>Simple ECommerce - Order</title>
-        <meta
-          name="description"
-          content="The order page of this simple ecommerce"
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <PageHead order={order} />
       <Tabs align="center" isLazy index={step} onChange={setStep}>
         <TabList>
           <Tab isDisabled={step !== 0}>Shipping Address</Tab>
@@ -186,6 +178,21 @@ const Order = () => {
         </TabPanels>
       </Tabs>
     </>
+  );
+};
+
+const PageHead = ({ order }: { order?: RouterOutputs['orders']['byId'] }) => {
+  const title = order
+    ? `Order: ${order.id} | ECommerce`
+    : 'Order page | ECommerce';
+  const description = 'View all the details of your order on ECommerce.';
+  return (
+    <Head>
+      <title>{title}</title>
+      <meta name="title" content={title} />
+      <meta name="description" content={description} />
+      <link rel="icon" href="/favicon.ico" />
+    </Head>
   );
 };
 
@@ -440,4 +447,4 @@ const OrderDetailsTabPanel = ({
   );
 };
 
-export default Order;
+export default OrderPage;

@@ -1,25 +1,22 @@
 import { type NextPage } from 'next';
 import Head from 'next/head';
 
-import { Box, Flex, Text } from '@chakra-ui/react';
+import { Flex } from '@chakra-ui/react';
 
 import { HomeFiltersContainer } from '~/features/filters/components';
 import { useFiltersSync } from '~/features/filters/hooks';
 import { ProductCard } from '~/features/products/components';
 import { useHomeProducts } from '~/features/products/hooks';
+import { CenteredAlert, CenteredLoadingIndicator } from '~/shared/components';
 
-const Home: NextPage = () => {
+const HomePage: NextPage = () => {
   const { products, areTheHomeProductsLoading } = useHomeProducts();
 
   useFiltersSync();
 
   return (
     <>
-      <Head>
-        <title>Simple ECommerce</title>
-        <meta name="description" content="A simple ECommerce example" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <PageHead />
       <Flex direction={{ base: 'column', md: 'row' }} w="100%">
         <HomeFiltersContainer />
         <Flex
@@ -29,15 +26,9 @@ const Home: NextPage = () => {
           justify={{ base: 'center', md: 'flex-start' }}
           gap="3"
         >
-          {areTheHomeProductsLoading && (
-            <Box w="100%">
-              <Text fontSize="xl">Loading...</Text>
-            </Box>
-          )}
+          {areTheHomeProductsLoading && <CenteredLoadingIndicator />}
           {!areTheHomeProductsLoading && products.length === 0 && (
-            <Box w="100%">
-              <Text fontSize="xl">No product found</Text>
-            </Box>
+            <CenteredAlert status="info">No product found</CenteredAlert>
           )}
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
@@ -48,4 +39,17 @@ const Home: NextPage = () => {
   );
 };
 
-export default Home;
+const PageHead = () => {
+  const title = 'Home page | ECommerce';
+  const description = 'Buy a diverse quantity of products on ECommerce.';
+  return (
+    <Head>
+      <title>{title}</title>
+      <meta name="title" content={title} />
+      <meta name="description" content={description} />
+      <link rel="icon" href="/favicon.ico" />
+    </Head>
+  );
+};
+
+export default HomePage;

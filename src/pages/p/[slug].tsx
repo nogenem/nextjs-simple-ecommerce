@@ -1,16 +1,15 @@
 import { useMemo, useState, type ChangeEvent } from 'react';
 import { MdOutlineAddShoppingCart } from 'react-icons/md';
 
+import type { NextPage } from 'next';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 import {
-  Alert,
-  AlertIcon,
   Box,
   Button,
   Card,
   CardBody,
-  CircularProgress,
   Flex,
   FormControl,
   FormHelperText,
@@ -37,13 +36,18 @@ import { useFilters, useFiltersSync } from '~/features/filters/hooks';
 import { useProductBySlug } from '~/features/products/hooks';
 import { ImagesCarousel } from '~/features/variant-images/components';
 import { useProductVariantByFilters } from '~/features/variants/hooks';
-import { ColorFilterItem, ShimmerImage } from '~/shared/components';
+import {
+  CenteredAlert,
+  CenteredLoadingIndicator,
+  ColorFilterItem,
+  ShimmerImage,
+} from '~/shared/components';
 import { formatPrice } from '~/shared/utils/format-price';
 import type { RouterOutputs } from '~/shared/utils/trpc';
 
 const SELECTED_IMAGE_SIZE = 350;
 
-const Product = () => {
+const ProductPage: NextPage = () => {
   useFiltersSync();
 
   const router = useRouter();
@@ -75,20 +79,19 @@ const Product = () => {
 
   if (isProductLoading || variant === undefined) {
     return (
-      <Flex w="100%" alignItems="center" justifyContent="center">
-        <CircularProgress isIndeterminate color="primary.300" />
-      </Flex>
+      <>
+        <PageHead />
+        <CenteredLoadingIndicator />
+      </>
     );
   }
 
   if (!product || variant === null) {
     return (
-      <Flex w="100%" alignItems="center" justifyContent="center">
-        <Alert status="error">
-          <AlertIcon />
-          Product not found
-        </Alert>
-      </Flex>
+      <>
+        <PageHead />
+        <CenteredAlert>Product not found</CenteredAlert>
+      </>
     );
   }
 
@@ -174,111 +177,135 @@ const Product = () => {
       : '';
 
   return (
-    <Flex w="100%" alignItems="center" justifyContent="center">
-      <Flex
-        w="100%"
-        maxW="1000"
-        flexDir={{ base: 'column', md: 'row' }}
-        justifyContent="center"
-        alignItems={{ base: 'center', md: 'start' }}
-        gap="5"
-      >
-        <Card maxW={SELECTED_IMAGE_SIZE}>
-          <CardBody borderRadius="lg" p={0}>
-            <Box
-              borderTopRadius="lg"
-              overflow="hidden"
-              border="1px solid"
-              borderColor={cardBorderColor}
-            >
-              <ShimmerImage
-                src={selectedImage?.url || ''}
-                alt={selectedImage?.alternative_text || ''}
-                width={SELECTED_IMAGE_SIZE}
-                maxW="100%"
-                height={SELECTED_IMAGE_SIZE}
-                transform="scale(1)"
-                transition="transform 0.5s"
-                willChange="transform"
-                _hover={{ transform: 'scale(1.1)' }}
+    <>
+      <PageHead product={product} />
+      <Flex w="100%" alignItems="center" justifyContent="center">
+        <Flex
+          w="100%"
+          maxW="1000"
+          flexDir={{ base: 'column', md: 'row' }}
+          justifyContent="center"
+          alignItems={{ base: 'center', md: 'start' }}
+          gap="5"
+        >
+          <Card maxW={SELECTED_IMAGE_SIZE}>
+            <CardBody borderRadius="lg" p={0}>
+              <Box
+                borderTopRadius="lg"
+                overflow="hidden"
+                border="1px solid"
+                borderColor={cardBorderColor}
+              >
+                <ShimmerImage
+                  src={selectedImage?.url || ''}
+                  alt={selectedImage?.alternative_text || ''}
+                  width={SELECTED_IMAGE_SIZE}
+                  maxW="100%"
+                  height={SELECTED_IMAGE_SIZE}
+                  transform="scale(1)"
+                  transition="transform 0.5s"
+                  willChange="transform"
+                  _hover={{ transform: 'scale(1.1)' }}
+                />
+              </Box>
+              <ImagesCarousel
+                images={variant.images}
+                selectedImageIndex={imageIdx}
+                onImageClick={onCarouselImageClick}
               />
-            </Box>
-            <ImagesCarousel
-              images={variant.images}
-              selectedImageIndex={imageIdx}
-              onImageClick={onCarouselImageClick}
+            </CardBody>
+          </Card>
+          <Flex w="100%" maxW="450" flexDir="column" gap="3">
+            <Heading>{product.name}</Heading>
+            <Box
+              className="user-content-wrapper"
+              dangerouslySetInnerHTML={{ __html: product.description_html }}
             />
-          </CardBody>
-        </Card>
-        <Flex w="100%" maxW="450" flexDir="column" gap="3">
-          <Heading>{product.name}</Heading>
-          <Box
-            className="user-content-wrapper"
-            dangerouslySetInnerHTML={{ __html: product.description_html }}
-          />
-          <Flex alignItems="center" gap="2">
-            {priceText}
-          </Flex>
-          <Box>
-            <Heading mb="2" size="sm">
-              Color
-            </Heading>
-            <Flex direction="row" gap="2">
-              {colors.map((color) => (
-                <ColorFilterItem key={color.id} color={color} />
-              ))}
+            <Flex alignItems="center" gap="2">
+              {priceText}
             </Flex>
-          </Box>
-          <Box>
-            <Heading mb="2" size="sm">
-              Size
-            </Heading>
-            <Select
-              onChange={handleSizeChange}
-              value={filters[URL_QUERY_KEYS.SIZE_ID]}
-            >
-              {sizes.map((size) => (
-                <option key={size.id} value={size.id}>
-                  {size.name}
-                </option>
-              ))}
-            </Select>
-          </Box>
+            <Box>
+              <Heading mb="2" size="sm">
+                Color
+              </Heading>
+              <Flex direction="row" gap="2">
+                {colors.map((color) => (
+                  <ColorFilterItem key={color.id} color={color} />
+                ))}
+              </Flex>
+            </Box>
+            <Box>
+              <Heading mb="2" size="sm">
+                Size
+              </Heading>
+              <Select
+                onChange={handleSizeChange}
+                value={filters[URL_QUERY_KEYS.SIZE_ID]}
+              >
+                {sizes.map((size) => (
+                  <option key={size.id} value={size.id}>
+                    {size.name}
+                  </option>
+                ))}
+              </Select>
+            </Box>
 
-          <FormControl>
-            <FormLabel>
-              Quantity ({variant.quantity_in_stock} in stock)
-            </FormLabel>
-            <NumberInput
-              min={1}
-              value={quantityToAdd}
-              onChange={handleQuantityToAddChange}
-              isDisabled={isSoldOut}
-            >
-              <NumberInputField />
-              <NumberInputStepper>
-                <NumberIncrementStepper />
-                <NumberDecrementStepper />
-              </NumberInputStepper>
-            </NumberInput>
-          </FormControl>
+            <FormControl>
+              <FormLabel>
+                Quantity ({variant.quantity_in_stock} in stock)
+              </FormLabel>
+              <NumberInput
+                min={1}
+                value={quantityToAdd}
+                onChange={handleQuantityToAddChange}
+                isDisabled={isSoldOut}
+              >
+                <NumberInputField />
+                <NumberInputStepper>
+                  <NumberIncrementStepper />
+                  <NumberDecrementStepper />
+                </NumberInputStepper>
+              </NumberInput>
+            </FormControl>
 
-          <FormControl w="100%">
-            <Button
-              rightIcon={<MdOutlineAddShoppingCart />}
-              colorScheme="primary"
-              onClick={handleAddToCartClick}
-              isLoading={isAddingItemToCart}
-              isDisabled={isSoldOut}
-              w="100%"
-            >
-              Add to cart
-            </Button>
-            <FormHelperText>{nVariantsInCartMessage}</FormHelperText>
-          </FormControl>
+            <FormControl w="100%">
+              <Button
+                rightIcon={<MdOutlineAddShoppingCart />}
+                colorScheme="primary"
+                onClick={handleAddToCartClick}
+                isLoading={isAddingItemToCart}
+                isDisabled={isSoldOut}
+                w="100%"
+              >
+                Add to cart
+              </Button>
+              <FormHelperText>{nVariantsInCartMessage}</FormHelperText>
+            </FormControl>
+          </Flex>
         </Flex>
       </Flex>
-    </Flex>
+    </>
+  );
+};
+
+const PageHead = ({
+  product,
+}: {
+  product?: RouterOutputs['products']['bySlug'];
+}) => {
+  const title = product
+    ? `${product.name} | ECommerce`
+    : 'Product page | ECommerce';
+  const description = product
+    ? `Buy the ${product.name} on ECommerce.`
+    : 'Buy a diverse quantity of products on ECommerce.';
+  return (
+    <Head>
+      <title>{title}</title>
+      <meta name="title" content={title} />
+      <meta name="description" content={description} />
+      <link rel="icon" href="/favicon.ico" />
+    </Head>
   );
 };
 
@@ -306,4 +333,4 @@ const getProductAttributesByType = (
   return attrs;
 };
 
-export default Product;
+export default ProductPage;
