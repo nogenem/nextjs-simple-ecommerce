@@ -34,9 +34,9 @@ import { useProtectedRoute } from '~/features/auth/hooks';
 import { OrderItemsTable } from '~/features/orders/components';
 import {
   useOrderById,
+  useUpdatePaymentMethod,
   useUpdateShippingAddress,
 } from '~/features/orders/hooks';
-import { useUpdatePaymentMethod } from '~/features/orders/hooks/use-update-payment-method';
 import { canEditOrderShippingAddressOrPaymentMethod } from '~/features/orders/utils/can-edit-order-shipping-address-or-payment-method';
 import { CenteredAlert, CenteredLoadingIndicator } from '~/shared/components';
 import type { TAddressSchema } from '~/shared/types/globals';
