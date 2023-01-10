@@ -38,6 +38,7 @@ import {
   useUpdateShippingAddress,
 } from '~/features/orders/hooks';
 import { canEditOrderShippingAddressOrPaymentMethod } from '~/features/orders/utils/can-edit-order-shipping-address-or-payment-method';
+import { PaypalButton } from '~/features/paypal/components';
 import { CenteredAlert, CenteredLoadingIndicator } from '~/shared/components';
 import type { TAddressSchema } from '~/shared/types/globals';
 import { formatPrice } from '~/shared/utils/format-price';
@@ -361,6 +362,7 @@ const OrderDetailsTabPanel = ({
   addressString += `${order.shippingAddress.city}, ${order.shippingAddress.state}, ${order.shippingAddress.postal_code}, ${order.shippingAddress.country}`;
 
   const canEdit = canEditOrderShippingAddressOrPaymentMethod(order);
+  const paymentMethod = order.paymentDetail.paymentMethod;
 
   return (
     <TabPanel>
@@ -436,7 +438,9 @@ const OrderDetailsTabPanel = ({
                   <Text>Total</Text>
                   <Text>{formatPrice(order.totalPrice)}</Text>
                 </HStack>
-                {/* TODO: Show the correct payment button */}
+                {!order.paidAt && paymentMethod === PaymentMethod.PAYPAL && (
+                  <PaypalButton order={order} />
+                )}
               </Stack>
             </CardBody>
           </Card>

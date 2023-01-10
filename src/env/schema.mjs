@@ -21,6 +21,8 @@ export const serverSchema = z.object({
   ),
   GOOGLE_ID: z.string(),
   GOOGLE_SECRET: z.string(),
+  PAYPAL_CLIENT_ID: z.string(),
+  PAYPAL_SECRET: z.string(),
 });
 
 /**
@@ -29,7 +31,7 @@ export const serverSchema = z.object({
  * To expose them to the client, prefix them with `NEXT_PUBLIC_`.
  */
 export const clientSchema = z.object({
-  // NEXT_PUBLIC_CLIENTVAR: z.string(),
+  NEXT_PUBLIC_PAYPAL_CLIENT_ID: z.string(),
 });
 
 /**
@@ -39,5 +41,5 @@ export const clientSchema = z.object({
  * @type {{ [k in keyof z.infer<typeof clientSchema>]: z.infer<typeof clientSchema>[k] | undefined }}
  */
 export const clientEnv = {
-  // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+  NEXT_PUBLIC_PAYPAL_CLIENT_ID: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
 };
