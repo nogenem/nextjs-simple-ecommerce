@@ -386,7 +386,11 @@ const OrderDetailsTabPanel = ({
                   </Button>
                 </Box>
               )}
-              {/* TODO: Show the date that it was shipped */}
+              {!!order.shippedAt && (
+                <CenteredAlert mt="3" status="success">
+                  Shipped at: {order.shippedAt.toLocaleString()}
+                </CenteredAlert>
+              )}
             </CardBody>
           </Card>
 
@@ -405,7 +409,11 @@ const OrderDetailsTabPanel = ({
                   </Button>
                 </Box>
               )}
-              {/* TODO: Show the date that it was paid */}
+              {!!order.paidAt && (
+                <CenteredAlert mt="3" status="success">
+                  Paid at: {order.paidAt.toLocaleString()}
+                </CenteredAlert>
+              )}
             </CardBody>
           </Card>
 
