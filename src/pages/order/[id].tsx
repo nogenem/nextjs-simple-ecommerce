@@ -389,6 +389,11 @@ const OrderDetailsTabPanel = ({
                   </Button>
                 </Box>
               )}
+              {!order.shippedAt && !!order.paidAt && (
+                <CenteredAlert mt="3" status="info">
+                  Waiting to be shipped.
+                </CenteredAlert>
+              )}
               {!!order.shippedAt && (
                 <CenteredAlert mt="3" status="success">
                   Shipped at: {order.shippedAt.toLocaleString()}
