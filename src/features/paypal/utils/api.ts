@@ -56,6 +56,11 @@ export async function createPaypalOrder(
           },
         },
       ],
+      application_context: {
+        payment_method: {
+          payee_preferred: 'IMMEDIATE_PAYMENT_REQUIRED',
+        },
+      },
     }),
   });
 
