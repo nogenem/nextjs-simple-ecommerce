@@ -4,6 +4,7 @@ import { categoriesRouter } from '~/features/categories/router';
 import { ordersRouter } from '~/features/orders/router';
 import { paypalRouter } from '~/features/paypal/router';
 import { productsRouter } from '~/features/products/router';
+import { stripeRouter } from '~/features/stripe/router';
 import { router } from '~/server/trpc/trpc';
 
 export const appRouter = router({
@@ -13,6 +14,7 @@ export const appRouter = router({
   cart: cartRouter,
   orders: ordersRouter,
   paypal: paypalRouter,
+  stripe: stripeRouter,
 });
 
 // export type definition of API

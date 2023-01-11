@@ -39,6 +39,8 @@ import {
 } from '~/features/orders/hooks';
 import { canEditOrderShippingAddressOrPaymentMethod } from '~/features/orders/utils/can-edit-order-shipping-address-or-payment-method';
 import { PaypalButton } from '~/features/paypal/components';
+import { StripeButton } from '~/features/stripe/components';
+import { useHandleStripeQueryKeys } from '~/features/stripe/hooks';
 import { CenteredAlert, CenteredLoadingIndicator } from '~/shared/components';
 import type { TAddressSchema } from '~/shared/types/globals';
 import { formatPrice } from '~/shared/utils/format-price';
@@ -73,6 +75,7 @@ const OrderPage: NextPage = () => {
   const [step, setStep] = useState(2);
 
   useProtectedRoute();
+  useHandleStripeQueryKeys();
 
   if (isOrderLoading) {
     return (
@@ -448,6 +451,9 @@ const OrderDetailsTabPanel = ({
                 </HStack>
                 {!order.paidAt && paymentMethod === PaymentMethod.PAYPAL && (
                   <PaypalButton order={order} />
+                )}
+                {!order.paidAt && paymentMethod === PaymentMethod.STRIPE && (
+                  <StripeButton order={order} />
                 )}
               </Stack>
             </CardBody>

@@ -23,6 +23,8 @@ export const serverSchema = z.object({
   GOOGLE_SECRET: z.string(),
   PAYPAL_CLIENT_ID: z.string(),
   PAYPAL_SECRET: z.string(),
+  STRIPE_PUBLIC: z.string(),
+  STRIPE_SECRET: z.string(),
 });
 
 /**
@@ -32,6 +34,7 @@ export const serverSchema = z.object({
  */
 export const clientSchema = z.object({
   NEXT_PUBLIC_PAYPAL_CLIENT_ID: z.string(),
+  NEXT_PUBLIC_STRIPE_PUBLIC: z.string(),
 });
 
 /**
@@ -42,4 +45,5 @@ export const clientSchema = z.object({
  */
 export const clientEnv = {
   NEXT_PUBLIC_PAYPAL_CLIENT_ID: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
+  NEXT_PUBLIC_STRIPE_PUBLIC: process.env.NEXT_PUBLIC_STRIPE_PUBLIC,
 };

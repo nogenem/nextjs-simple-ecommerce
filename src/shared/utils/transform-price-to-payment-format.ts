@@ -7,7 +7,6 @@ export const transformPriceToPaymentFormat = (
   if (paymentMethod === PaymentMethod.PAYPAL) {
     return `${price / 100}`;
   } else if (paymentMethod === PaymentMethod.STRIPE) {
-    // TODO: Still dont know what their API expects...
     return price;
   }
   return price;

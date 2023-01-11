@@ -7,12 +7,14 @@ import { HomeFiltersContainer } from '~/features/filters/components';
 import { useFiltersSync } from '~/features/filters/hooks';
 import { ProductCard } from '~/features/products/components';
 import { useHomeProducts } from '~/features/products/hooks';
+import { useHandleStripeQueryKeys } from '~/features/stripe/hooks';
 import { CenteredAlert, CenteredLoadingIndicator } from '~/shared/components';
 
 const HomePage: NextPage = () => {
   const { products, areTheHomeProductsLoading } = useHomeProducts();
 
   useFiltersSync();
+  useHandleStripeQueryKeys();
 
   return (
     <>
