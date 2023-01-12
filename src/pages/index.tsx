@@ -1,11 +1,12 @@
 import { type NextPage } from 'next';
 import Head from 'next/head';
 
-import { Flex } from '@chakra-ui/react';
+import { Flex, Show, Text } from '@chakra-ui/react';
 
 import {
   HomeFiltersContainer,
   SearchFilter,
+  SortFilter,
 } from '~/features/filters/components';
 import { useFiltersSync } from '~/features/filters/hooks';
 import { ProductCard } from '~/features/products/components';
@@ -25,9 +26,7 @@ const HomePage: NextPage = () => {
       <Flex direction={{ base: 'column', md: 'row' }} w="100%">
         <HomeFiltersContainer />
         <Flex flexDir="column" w="100%">
-          <Flex mb="3" justifyContent="center">
-            <SearchFilter />
-          </Flex>
+          <HeaderFilters productsLen={products.length} />
           <Flex
             w="100%"
             wrap="wrap"
@@ -59,6 +58,40 @@ const PageHead = () => {
       <meta name="description" content={description} />
       <link rel="icon" href="/favicon.ico" />
     </Head>
+  );
+};
+
+const HeaderFilters = ({ productsLen }: { productsLen: number }) => {
+  return (
+    <>
+      <Show above="lg">
+        <Flex mb="3" gap="3" justifyContent="space-between" alignItems="center">
+          <Text whiteSpace="nowrap">{productsLen} products</Text>
+          <SearchFilter />
+          <SortFilter />
+        </Flex>
+      </Show>
+      <Show below="lg">
+        <Flex
+          mb="3"
+          gap="3"
+          justifyContent="center"
+          alignItems="center"
+          direction="column"
+        >
+          <SearchFilter />
+          <Flex
+            w="100%"
+            justifyContent="space-between"
+            alignItems="center"
+            gap="3"
+          >
+            <Text whiteSpace="nowrap">{productsLen} products</Text>
+            <SortFilter />
+          </Flex>
+        </Flex>
+      </Show>
+    </>
   );
 };
 

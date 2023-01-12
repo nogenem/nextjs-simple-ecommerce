@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { type Context } from '~/server/trpc/context';
 import { publicProcedure, router } from '~/server/trpc/trpc';
 
+import type { SORT_OPTIONS } from '../filters/constants/url-query-keys';
 import {
   URL_QUERY_KEYS,
   URL_QUERY_KEYS_SCHEME,
@@ -45,6 +46,8 @@ export const productsRouter = router({
       const colorId = input[URL_QUERY_KEYS.COLOR_ID]?.toString();
       const sizeId = input[URL_QUERY_KEYS.SIZE_ID]?.toString();
       const search = input[URL_QUERY_KEYS.SEARCH]?.toString();
+      const sort = (input[URL_QUERY_KEYS.SORT] ||
+        'price-asc') as typeof SORT_OPTIONS[number];
 
       // If no one answers, then i will keep this version with `queryRaw`
       // PS: https://github.com/prisma/prisma/discussions/16808
@@ -55,6 +58,7 @@ export const productsRouter = router({
         colorId,
         sizeId,
         search,
+        sort,
       });
     }),
   bySlug: publicProcedure
@@ -104,6 +108,7 @@ const getHomeProducts = async (
     colorId,
     sizeId,
     search,
+    sort,
   }: {
     categoryId?: string;
     minPrice: number;
@@ -111,6 +116,7 @@ const getHomeProducts = async (
     colorId?: string;
     sizeId?: string;
     search?: string;
+    sort: typeof SORT_OPTIONS[number];
   },
 ) => {
   minPrice = minPrice || 0;
@@ -135,12 +141,16 @@ const getHomeProducts = async (
   const searchClause = search
     ? Prisma.sql`p.name LIKE ${search}`
     : Prisma.sql`p.name IS NOT NULL`;
+  const sortClause = SORT_CLAUSES[sort];
   const discountedPriceClause = Prisma.sql`
   v.price * (1 - IFNULL(d.percent, 0) / 100)
   `;
-  // If out of stock, then i want it showing up at the bottom, hence the multiplication by 10
-  const discountedPriceWithStockClause = Prisma.sql`
+  // If out of stock, then i want it showing up at the bottom, hence the multiplication by 10/-10
+  const minDiscountedPriceWithStockClause = Prisma.sql`
   IF(v.quantity_in_stock > 0, 1, 10) * v.price * (1 - IFNULL(d.percent, 0) / 100)
+  `;
+  const maxDiscountedPriceWithStockClause = Prisma.sql`
+  IF(v.quantity_in_stock > 0, 1, -10) * v.price * (1 - IFNULL(d.percent, 0) / 100)
   `;
 
   // Find the products
@@ -155,7 +165,8 @@ const getHomeProducts = async (
     p.updated_at,
     p.categoryId,
     p.discountId,
-    MIN(${discountedPriceWithStockClause}) minDiscountedPrice
+    MIN(${minDiscountedPriceWithStockClause}) minDiscountedPrice,
+    MAX(${maxDiscountedPriceWithStockClause}) maxDiscountedPrice
   FROM
     Product p
     INNER JOIN Variant v ON v.productId = p.id
@@ -176,7 +187,8 @@ const getHomeProducts = async (
     ${discountedPriceClause} <= ${maxPrice} AND
     ${searchClause}
   GROUP BY p.id
-  ORDER BY minDiscountedPrice ASC, p.name ASC`;
+  ${sortClause}
+  `;
 
   if (productsResults.length === 0) {
     return [] as THomeProduct[];
@@ -213,7 +225,8 @@ const getHomeProducts = async (
     (Variant & { discountedPrice: number })[]
   > = ctx.prisma.$queryRaw`SELECT
     v.*,
-    ${discountedPriceWithStockClause} discountedPrice
+    ${minDiscountedPriceWithStockClause} minDiscountedPrice,
+    ${maxDiscountedPriceWithStockClause} maxDiscountedPrice
   FROM
     Variant v
     INNER JOIN Product p ON p.id = v.productId
@@ -233,7 +246,7 @@ const getHomeProducts = async (
     ${discountedPriceClause} >= ${minPrice} AND
     ${discountedPriceClause} <= ${maxPrice} AND
     ${searchClause}
-  ORDER BY discountedPrice ASC, p.name ASC
+  ${sortClause}
   `;
 
   // Find the categories, discounts and variants
@@ -348,4 +361,13 @@ const getHomeProducts = async (
   );
 
   return finalResults;
+};
+
+const SORT_CLAUSES: {
+  [s in typeof SORT_OPTIONS[number]]: ReturnType<typeof Prisma.sql>;
+} = {
+  ['price-asc']: Prisma.sql`ORDER BY minDiscountedPrice ASC, p.name ASC`,
+  ['price-desc']: Prisma.sql`ORDER BY maxDiscountedPrice DESC, p.name ASC`,
+  ['name-asc']: Prisma.sql`ORDER BY p.name ASC, minDiscountedPrice ASC`,
+  ['name-desc']: Prisma.sql`ORDER BY p.name DESC, minDiscountedPrice ASC`,
 };

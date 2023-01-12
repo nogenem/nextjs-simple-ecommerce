@@ -56,10 +56,11 @@ const getOnlyValidFilters = (filters: TRouterQuery): TFilters => {
 
   const validFilters: TFilters = {};
   Object.entries(filters).forEach(([key, value]) => {
-    const parsedScheme =
+    const validator =
       !!keysToTrueObj[key] &&
       !!URL_QUERY_KEYS_VALIDATIONS[key] &&
-      URL_QUERY_KEYS_VALIDATIONS[key]?.safeParse(value);
+      URL_QUERY_KEYS_VALIDATIONS[key];
+    const parsedScheme = !!validator && validator.safeParse(value);
 
     if (!!parsedScheme && parsedScheme.success) {
       validFilters[key] = parsedScheme.data;
