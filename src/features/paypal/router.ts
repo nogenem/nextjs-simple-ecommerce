@@ -184,6 +184,9 @@ export const paypalRouter = router({
               quantity_in_stock: {
                 decrement: item.quantity,
               },
+              sold_amount: {
+                increment: item.quantity,
+              },
             },
           }),
         ),
