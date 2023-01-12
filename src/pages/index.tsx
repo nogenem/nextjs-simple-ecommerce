@@ -3,7 +3,10 @@ import Head from 'next/head';
 
 import { Flex } from '@chakra-ui/react';
 
-import { HomeFiltersContainer } from '~/features/filters/components';
+import {
+  HomeFiltersContainer,
+  SearchFilter,
+} from '~/features/filters/components';
 import { useFiltersSync } from '~/features/filters/hooks';
 import { ProductCard } from '~/features/products/components';
 import { useHomeProducts } from '~/features/products/hooks';
@@ -21,20 +24,25 @@ const HomePage: NextPage = () => {
       <PageHead />
       <Flex direction={{ base: 'column', md: 'row' }} w="100%">
         <HomeFiltersContainer />
-        <Flex
-          w="100%"
-          wrap="wrap"
-          grow="1"
-          justify={{ base: 'center', md: 'flex-start' }}
-          gap="3"
-        >
-          {areTheHomeProductsLoading && <CenteredLoadingIndicator />}
-          {!areTheHomeProductsLoading && products.length === 0 && (
-            <CenteredAlert status="info">No product found</CenteredAlert>
-          )}
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+        <Flex flexDir="column" w="100%">
+          <Flex mb="3" justifyContent="center">
+            <SearchFilter />
+          </Flex>
+          <Flex
+            w="100%"
+            wrap="wrap"
+            grow="1"
+            justify={{ base: 'center', md: 'flex-start' }}
+            gap="3"
+          >
+            {areTheHomeProductsLoading && <CenteredLoadingIndicator />}
+            {!areTheHomeProductsLoading && products.length === 0 && (
+              <CenteredAlert status="info">No product found</CenteredAlert>
+            )}
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </Flex>
         </Flex>
       </Flex>
     </>

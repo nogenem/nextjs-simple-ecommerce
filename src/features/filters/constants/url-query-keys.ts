@@ -6,6 +6,7 @@ export const URL_QUERY_KEYS = {
   MAX_PRICE: 'max_price',
   COLOR_ID: 'color_id',
   SIZE_ID: 'size_id',
+  SEARCH: 'search',
 };
 
 export const URL_QUERY_KEYS_VALIDATIONS = {
@@ -20,6 +21,7 @@ export const URL_QUERY_KEYS_VALIDATIONS = {
   }),
   [URL_QUERY_KEYS.COLOR_ID]: z.string().min(1),
   [URL_QUERY_KEYS.SIZE_ID]: z.string().min(1),
+  [URL_QUERY_KEYS.SEARCH]: z.string().min(1),
 };
 
 export const URL_QUERY_KEYS_SCHEME = z

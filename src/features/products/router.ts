@@ -44,6 +44,7 @@ export const productsRouter = router({
       }
       const colorId = input[URL_QUERY_KEYS.COLOR_ID]?.toString();
       const sizeId = input[URL_QUERY_KEYS.SIZE_ID]?.toString();
+      const search = input[URL_QUERY_KEYS.SEARCH]?.toString();
 
       // If no one answers, then i will keep this version with `queryRaw`
       // PS: https://github.com/prisma/prisma/discussions/16808
@@ -53,6 +54,7 @@ export const productsRouter = router({
         maxPrice,
         colorId,
         sizeId,
+        search,
       });
     }),
   bySlug: publicProcedure
@@ -101,16 +103,19 @@ const getHomeProducts = async (
     maxPrice,
     colorId,
     sizeId,
+    search,
   }: {
     categoryId?: string;
     minPrice: number;
     maxPrice?: number;
     colorId?: string;
     sizeId?: string;
+    search?: string;
   },
 ) => {
   minPrice = minPrice || 0;
   maxPrice = maxPrice || MYSQL_MAX_INT_VALUE;
+  search = search ? `%${search}%` : search;
 
   const categoryClause = categoryId
     ? Prisma.sql`c.id = ${categoryId}`
@@ -127,6 +132,9 @@ const getHomeProducts = async (
   const a2SizeClause = sizeId
     ? Prisma.sql`(a2.type = ${AttributeType.Size} AND a2.id = ${sizeId})`
     : Prisma.sql`(a2.type = ${AttributeType.Size} AND a2.id IS NOT NULL)`;
+  const searchClause = search
+    ? Prisma.sql`p.name LIKE ${search}`
+    : Prisma.sql`p.name IS NOT NULL`;
   const discountedPriceClause = Prisma.sql`
   v.price * (1 - IFNULL(d.percent, 0) / 100)
   `;
@@ -165,7 +173,8 @@ const getHomeProducts = async (
     ${a1ColorClause} AND 
     ${a2SizeClause} AND
     ${discountedPriceClause} >= ${minPrice} AND
-    ${discountedPriceClause} <= ${maxPrice}
+    ${discountedPriceClause} <= ${maxPrice} AND
+    ${searchClause}
   GROUP BY p.id
   ORDER BY minDiscountedPrice ASC, p.name ASC`;
 
@@ -222,7 +231,8 @@ const getHomeProducts = async (
     ${a2SizeClause} AND
     v.productId IN (${Prisma.join(productsIds)}) AND
     ${discountedPriceClause} >= ${minPrice} AND
-    ${discountedPriceClause} <= ${maxPrice}
+    ${discountedPriceClause} <= ${maxPrice} AND
+    ${searchClause}
   ORDER BY discountedPrice ASC, p.name ASC
   `;
 
