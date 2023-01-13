@@ -1,4 +1,5 @@
 import { signIn, signOut, useSession } from 'next-auth/react';
+import Link from 'next/link';
 
 import {
   Avatar,
@@ -71,6 +72,9 @@ const LoggedInUserMenuItems = ({
       </Center>
       <br />
       <MenuDivider />
+      <MenuItem as={Link} href="/orders">
+        Orders
+      </MenuItem>
       <MenuItem onClick={() => signOut()}>Logout</MenuItem>
     </>
   );

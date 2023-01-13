@@ -232,4 +232,37 @@ export const ordersRouter = router({
         },
       });
     }),
+  listForTable: protectedProcedure
+    .input(
+      z.object({
+        loggedInUserOnly: z.boolean().default(false),
+      }),
+    )
+    .query(({ ctx, input }) => {
+      const user = ctx.session.user;
+
+      return ctx.prisma.order.findMany({
+        where: input.loggedInUserOnly
+          ? {
+              userId: user.id,
+            }
+          : undefined,
+        select: {
+          id: true,
+          created_at: true,
+          paymentDetail: {
+            select: {
+              paymentMethod: true,
+            },
+          },
+          totalPrice: true,
+          currency_code: true,
+          paidAt: true,
+          shippedAt: true,
+        },
+        orderBy: {
+          created_at: 'desc',
+        },
+      });
+    }),
 });
