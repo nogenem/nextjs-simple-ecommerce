@@ -45,7 +45,7 @@ const CartPage: NextPage = () => {
       <PageHead />
       <Flex
         w="100%"
-        maxW="1000"
+        maxW="65rem"
         margin="auto"
         flexDir="column"
         alignItems="center"

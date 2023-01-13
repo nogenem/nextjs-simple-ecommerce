@@ -75,7 +75,7 @@ const EditableTableItemQuantityCell = ({
       <Tooltip label={quantityErrorTooltipLabel}>
         <NumberInput
           key={item.quantity}
-          maxW="100"
+          maxW="7rem"
           min={1}
           max={variant.quantity_in_stock}
           defaultValue={item.quantity}

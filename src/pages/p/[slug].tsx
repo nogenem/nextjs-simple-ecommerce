@@ -182,7 +182,7 @@ const ProductPage: NextPage = () => {
       <Flex w="100%" alignItems="center" justifyContent="center">
         <Flex
           w="100%"
-          maxW="1000"
+          maxW="65rem"
           flexDir={{ base: 'column', md: 'row' }}
           justifyContent="center"
           alignItems={{ base: 'center', md: 'start' }}
@@ -215,7 +215,7 @@ const ProductPage: NextPage = () => {
               />
             </CardBody>
           </Card>
-          <Flex w="100%" maxW="450" flexDir="column" gap="3">
+          <Flex w="100%" maxW="29rem" flexDir="column" gap="3">
             <Heading>{product.name}</Heading>
             <Box
               className="user-content-wrapper"
