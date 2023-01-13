@@ -18,7 +18,7 @@ const UserMenu = () => {
   const { data: session } = useSession();
   const color = useColorModeValue('primary.500', 'white');
 
-  const userName = session?.user?.name || 'John Doe';
+  const userName = session?.user?.name || undefined;
   const userImg = session?.user?.image || undefined;
 
   return (
@@ -31,8 +31,14 @@ const UserMenu = () => {
           cursor="pointer"
           minW={0}
           h={8}
+          aria-label="Open navbar menu"
         >
-          <Avatar size="sm" src={userImg} />
+          <Avatar
+            size="sm"
+            src={userImg}
+            name={userName}
+            iconLabel="Default avatar image"
+          />
         </MenuButton>
         <MenuList alignItems="center" color={color}>
           {!session && <DefaultUserMenuItems />}
@@ -57,18 +63,23 @@ const LoggedInUserMenuItems = ({
   userName,
   userImg,
 }: {
-  userName: string;
+  userName?: string;
   userImg?: string;
 }) => {
   return (
     <>
       <br />
       <Center>
-        <Avatar size="2xl" src={userImg} />
+        <Avatar
+          size="2xl"
+          src={userImg}
+          name={userName}
+          iconLabel="Default avatar image"
+        />
       </Center>
       <br />
       <Center>
-        <p>{userName}</p>
+        <p>{userName || 'John Doe'}</p>
       </Center>
       <br />
       <MenuDivider />
