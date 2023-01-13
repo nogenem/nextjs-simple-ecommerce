@@ -21,10 +21,12 @@ type TFiltersState = {
   };
 };
 
+export const INITIAL_EMPTY_FILTERS = {} as TFilters;
+
 const useFiltersStore = create<TFiltersState>()(
   devtools(
     (set) => ({
-      filters: {},
+      filters: INITIAL_EMPTY_FILTERS,
       actions: {
         setFilters: (filters) =>
           set(() => ({ filters: getOnlyValidFilters(filters) }), false, {
@@ -48,7 +50,7 @@ const useFiltersStore = create<TFiltersState>()(
   ),
 );
 
-const getOnlyValidFilters = (filters: TRouterQuery): TFilters => {
+export const getOnlyValidFilters = (filters: TRouterQuery): TFilters => {
   const keysToTrueObj = Object.values(URL_QUERY_KEYS).reduce((prev, curr) => {
     prev[curr] = true;
     return prev;

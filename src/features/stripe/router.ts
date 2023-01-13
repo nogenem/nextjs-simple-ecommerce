@@ -42,7 +42,7 @@ export const stripeRouter = router({
         });
       }
 
-      const baseUrl = ctx.req.headers.origin || env.NEXTAUTH_URL;
+      const baseUrl = ctx.req?.headers.origin || env.NEXTAUTH_URL;
       const session = await createSession(
         order.id,
         baseUrl,

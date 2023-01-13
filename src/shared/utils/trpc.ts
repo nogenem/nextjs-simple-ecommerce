@@ -11,25 +11,59 @@ const getBaseUrl = () => {
   return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
 };
 
+// SOURCE: https://trpc.io/docs/ssr
 export const trpc = createTRPCNext<AppRouter>({
-  config() {
+  config({ ctx }) {
+    const loggerLinkItem = loggerLink({
+      enabled: (opts) =>
+        process.env.NODE_ENV === 'development' ||
+        (opts.direction === 'down' && opts.result instanceof Error),
+    });
+
+    const queryClientConfig = {
+      defaultOptions: {
+        queries: { staleTime: 60 * 1000 },
+      },
+    };
+
+    // during client requests
+    if (typeof window !== 'undefined') {
+      return {
+        transformer: superjson,
+        links: [
+          loggerLinkItem,
+          httpBatchLink({
+            url: '/api/trpc',
+          }),
+        ],
+        queryClientConfig,
+      };
+    }
+
     return {
       transformer: superjson,
       links: [
-        loggerLink({
-          enabled: (opts) =>
-            process.env.NODE_ENV === 'development' ||
-            (opts.direction === 'down' && opts.result instanceof Error),
-        }),
+        loggerLinkItem,
         httpBatchLink({
           url: `${getBaseUrl()}/api/trpc`,
+          headers() {
+            if (ctx?.req) {
+              const {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                connection: _connection,
+                ...headers
+              } = ctx.req.headers;
+
+              return {
+                ...headers,
+                'x-ssr': '1',
+              };
+            }
+            return {};
+          },
         }),
       ],
-      queryClientConfig: {
-        defaultOptions: {
-          queries: { staleTime: 60 * 1000 },
-        },
-      },
+      queryClientConfig,
     };
   },
   ssr: false,

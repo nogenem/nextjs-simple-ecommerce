@@ -1,17 +1,23 @@
+import type { GetServerSidePropsContext } from 'next';
 import { type NextPage } from 'next';
 import Head from 'next/head';
 
 import { Flex, Show, Text } from '@chakra-ui/react';
+import { AttributeType } from '@prisma/client';
+import { createProxySSGHelpers } from '@trpc/react-query/ssg';
+import superjson from 'superjson';
 
 import {
   HomeFiltersContainer,
   SearchFilter,
   SortFilter,
 } from '~/features/filters/components';
-import { useFiltersSync } from '~/features/filters/hooks';
+import { getOnlyValidFilters, useFiltersSync } from '~/features/filters/hooks';
 import { ProductCard } from '~/features/products/components';
 import { useHomeProducts } from '~/features/products/hooks';
 import { useHandleStripeQueryKeys } from '~/features/stripe/hooks';
+import { createContextInner } from '~/server/trpc/context';
+import { appRouter } from '~/server/trpc/router';
 import { CenteredAlert, CenteredLoadingIndicator } from '~/shared/components';
 
 const HomePage: NextPage = () => {
@@ -94,5 +100,27 @@ const HeaderFilters = ({ productsLen }: { productsLen: number }) => {
     </>
   );
 };
+
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const ssg = createProxySSGHelpers({
+    router: appRouter,
+    ctx: await createContextInner({ session: null }),
+    transformer: superjson,
+  });
+
+  await Promise.all([
+    ssg.attributes.all.prefetch({ type: AttributeType.Size }),
+    ssg.attributes.all.prefetch({ type: AttributeType.Color }),
+    ssg.categories.all.prefetch(),
+    ssg.products.home.prefetch(getOnlyValidFilters(ctx.query)),
+    ssg.cart.sumItemsQuantities.prefetch(),
+  ]);
+
+  return {
+    props: {
+      trpcState: ssg.dehydrate(),
+    },
+  };
+}
 
 export default HomePage;
