@@ -62,6 +62,7 @@ const ShimmerImage = ({
           onError={handleError}
           priority={priority}
           quality={quality}
+          sizes={`${width}px`}
         />
         {bgGradient && (
           <Box

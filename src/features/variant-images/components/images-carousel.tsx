@@ -63,6 +63,7 @@ const ImagesCarousel = ({
               alt={img.alternative_text}
               width={IMAGE_SIZE}
               height={IMAGE_SIZE}
+              sizes={`${IMAGE_SIZE}px`}
             />
           </Box>
         );

@@ -35,6 +35,7 @@ const TableItem = ({ item }: TTableItemProps) => {
       width={IMAGE_SIZE}
       height={IMAGE_SIZE}
       style={{ maxWidth: 'unset' }}
+      sizes={`${IMAGE_SIZE}px`}
     />
   );
   if (variant.available_for_sale) {

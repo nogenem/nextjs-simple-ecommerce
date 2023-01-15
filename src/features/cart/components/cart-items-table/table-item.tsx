@@ -53,6 +53,7 @@ const EditableTableItem = ({ item }: Pick<TTableItemProps, 'item'>) => {
       width={IMAGE_SIZE}
       height={IMAGE_SIZE}
       style={{ maxWidth: 'unset' }}
+      sizes={`${IMAGE_SIZE}px`}
     />
   );
   if (variant.available_for_sale) {
@@ -122,6 +123,7 @@ const NonEditableTableItem = ({ item }: Pick<TTableItemProps, 'item'>) => {
             width={IMAGE_SIZE}
             height={IMAGE_SIZE}
             style={{ maxWidth: 'unset' }}
+            sizes={`${IMAGE_SIZE}px`}
           />
         </Flex>
       </Td>
