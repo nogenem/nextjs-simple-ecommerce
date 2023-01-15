@@ -3,12 +3,7 @@ import { MdCircle } from 'react-icons/md';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 
-import {
-  Icon,
-  Tooltip,
-  useColorModeValue,
-  VisuallyHidden,
-} from '@chakra-ui/react';
+import { Icon, IconButton, Tooltip, useColorModeValue } from '@chakra-ui/react';
 
 import { URL_QUERY_KEYS } from '~/features/filters/constants/url-query-keys';
 
@@ -30,16 +25,14 @@ const ColorFilterItem = ({
           query: { ...query, [URL_QUERY_KEYS.COLOR_ID]: color.id },
         }}
       >
-        <VisuallyHidden>{color.name}</VisuallyHidden>
-        <Icon
-          boxSize="1.25rem"
-          as={MdCircle}
-          fill={color.value}
+        <IconButton
+          variant="ghost"
+          aria-label={color.name}
+          icon={<Icon boxSize="1.25rem" as={MdCircle} fill={color.value} />}
           border={
             query[URL_QUERY_KEYS.COLOR_ID] === color.id ? '1px solid' : ''
           }
           borderColor={activeBorderColor}
-          borderRadius="50%"
         />
       </NextLink>
     </Tooltip>

@@ -1,15 +1,7 @@
-import {
-  Flex,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  Text,
-  Tooltip,
-} from '@chakra-ui/react';
+import { Flex, Text, Tooltip } from '@chakra-ui/react';
 
 import { useUpdateItemQuantity } from '~/features/cart/hooks';
+import { NumberInput } from '~/shared/components';
 import { useDebouncedCallback } from '~/shared/hooks';
 import type { RouterOutputs } from '~/shared/utils/trpc';
 
@@ -72,10 +64,10 @@ const EditableTableItemQuantityCell = ({
 
   return (
     <Flex w="100%" justifyContent="center">
-      <Tooltip label={quantityErrorTooltipLabel}>
+      <Tooltip label={quantityErrorTooltipLabel} shouldWrapChildren>
         <NumberInput
           key={item.quantity}
-          maxW="7rem"
+          containerProps={{ maxW: '12rem' }}
           min={1}
           max={variant.quantity_in_stock}
           defaultValue={item.quantity}
@@ -83,13 +75,7 @@ const EditableTableItemQuantityCell = ({
           isDisabled={isUpdatingItemQuantity || !variant.available_for_sale}
           allowMouseWheel
           isValidCharacter={(value: string) => /[0-9]+/.test(value)}
-        >
-          <NumberInputField />
-          <NumberInputStepper>
-            <NumberIncrementStepper />
-            <NumberDecrementStepper />
-          </NumberInputStepper>
-        </NumberInput>
+        />
       </Tooltip>
     </Flex>
   );

@@ -15,11 +15,6 @@ import {
   FormHelperText,
   FormLabel,
   Heading,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
   Select,
   Text,
   useColorModeValue,
@@ -40,6 +35,7 @@ import {
   CenteredAlert,
   CenteredLoadingIndicator,
   ColorFilterItem,
+  NumberInput,
   ShimmerImage,
 } from '~/shared/components';
 import { formatPrice } from '~/shared/utils/format-price';
@@ -228,7 +224,7 @@ const ProductPage: NextPage = () => {
               <Heading mb="2" size="sm">
                 Color
               </Heading>
-              <Flex direction="row" gap="2">
+              <Flex direction="row" wrap="wrap" gap="3">
                 {colors.map((color) => (
                   <ColorFilterItem key={color.id} color={color} />
                 ))}
@@ -259,13 +255,7 @@ const ProductPage: NextPage = () => {
                 value={quantityToAdd}
                 onChange={handleQuantityToAddChange}
                 isDisabled={isSoldOut}
-              >
-                <NumberInputField />
-                <NumberInputStepper>
-                  <NumberIncrementStepper />
-                  <NumberDecrementStepper />
-                </NumberInputStepper>
-              </NumberInput>
+              />
             </FormControl>
 
             <FormControl w="100%">

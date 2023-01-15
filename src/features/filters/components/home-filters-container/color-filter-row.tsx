@@ -20,7 +20,7 @@ const ColorFilterRow = () => {
         queryParamKeys={[URL_QUERY_KEYS.COLOR_ID]}
       />
       {areTheColorsLoading && <Box>Loading...</Box>}
-      <Flex direction="row" gap="2">
+      <Flex direction="row" wrap="wrap" gap="3">
         {colors.map((color) => (
           <ColorFilterItem key={color.id} color={color} />
         ))}

@@ -54,6 +54,7 @@ const SizeFilterItem = ({
           query[URL_QUERY_KEYS.SIZE_ID] === size.id ? 'underline' : 'unset'
         }
         color={query[URL_QUERY_KEYS.SIZE_ID] === size.id ? activeColor : ''}
+        lineHeight="2rem"
       >
         {size.name}
       </Link>

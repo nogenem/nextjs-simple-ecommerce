@@ -54,6 +54,7 @@ const CategoryFilterItem = ({
         color={
           query[URL_QUERY_KEYS.CATEGORY_ID] === category.id ? activeColor : ''
         }
+        lineHeight="2rem"
       >
         {category.name}
       </Link>

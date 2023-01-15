@@ -2,7 +2,7 @@ import { MdClose } from 'react-icons/md';
 
 import { useRouter } from 'next/router';
 
-import { Box, Flex, Heading, Icon, Tooltip } from '@chakra-ui/react';
+import { Flex, Heading, Icon, IconButton, Tooltip } from '@chakra-ui/react';
 
 type TFilterRowHeaderProps = {
   label: string;
@@ -32,15 +32,17 @@ const FilterRowHeader = ({ label, queryParamKeys }: TFilterRowHeaderProps) => {
   };
 
   return (
-    <Flex justify="space-between">
-      <Heading mb="2" size="sm">
-        {label}
-      </Heading>
+    <Flex justify="space-between" mb="2">
+      <Heading size="sm">{label}</Heading>
       {hasAnyKey && (
         <Tooltip label="Remove filter">
-          <Box as="button" onClick={handleOnClick}>
-            <Icon boxSize="1.25rem" as={MdClose} />
-          </Box>
+          <IconButton
+            size="xs"
+            variant="ghost"
+            aria-label="Remove filter"
+            icon={<Icon boxSize="1.25rem" as={MdClose} />}
+            onClick={handleOnClick}
+          />
         </Tooltip>
       )}
     </Flex>

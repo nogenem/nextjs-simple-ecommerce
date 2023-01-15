@@ -1,18 +1,10 @@
 import { useRouter } from 'next/router';
 
-import {
-  Flex,
-  FormControl,
-  FormLabel,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-} from '@chakra-ui/react';
+import { Flex, FormControl, FormLabel } from '@chakra-ui/react';
 
 import { URL_QUERY_KEYS } from '~/features/filters/constants/url-query-keys';
 import { useFilterByKey } from '~/features/filters/hooks';
+import { NumberInput } from '~/shared/components';
 import { useDebouncedCallback } from '~/shared/hooks';
 
 import { FilterRowHeader } from './filter-row-header';
@@ -83,13 +75,7 @@ const PriceFilterRow = () => {
           min={0}
           defaultValue={minPrice}
           onChange={handleMinPriceChange}
-        >
-          <NumberInputField />
-          <NumberInputStepper>
-            <NumberIncrementStepper />
-            <NumberDecrementStepper />
-          </NumberInputStepper>
-        </NumberInput>
+        />
       </FormControl>
       <FormControl>
         <FormLabel>Max. price</FormLabel>
@@ -98,13 +84,7 @@ const PriceFilterRow = () => {
           min={(+minPrice || 0) + 1}
           defaultValue={maxPrice}
           onChange={handleMaxPriceChange}
-        >
-          <NumberInputField />
-          <NumberInputStepper>
-            <NumberIncrementStepper />
-            <NumberDecrementStepper />
-          </NumberInputStepper>
-        </NumberInput>
+        />
       </FormControl>
     </Flex>
   );
