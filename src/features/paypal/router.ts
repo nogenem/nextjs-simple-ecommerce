@@ -3,11 +3,8 @@ import { z } from 'zod';
 
 import { protectedProcedure, router } from '~/server/trpc/trpc';
 
-import {
-  capturePaypalPayment,
-  createPaypalOrder,
-  PAYPAL_STATUS,
-} from './utils/api';
+import { PAYPAL_STATUS } from './constants/status';
+import { capturePaypalPayment, createPaypalOrder } from './utils/api';
 
 export const paypalRouter = router({
   createOrder: protectedProcedure

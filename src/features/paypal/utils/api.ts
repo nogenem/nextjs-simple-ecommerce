@@ -5,6 +5,8 @@ import fetch from 'node-fetch';
 import { env } from '~/env/server.mjs';
 import { transformPriceToPaymentFormat } from '~/shared/utils/transform-price-to-payment-format';
 
+import type { TPaypalStatus } from '../constants/status';
+
 // SOURCE: https://github.com/paypal-examples/docs-examples/tree/main/advanced-integration
 const CLIENT_ID = env.PAYPAL_CLIENT_ID;
 const APP_SECRET = env.PAYPAL_SECRET;
@@ -12,17 +14,6 @@ const BASE_API_URL =
   process.env.NODE_ENV === 'production'
     ? 'https://api.paypal.com'
     : 'https://api.sandbox.paypal.com';
-
-export const PAYPAL_STATUS = {
-  CREATED: 'CREATED',
-  SAVED: 'SAVED',
-  APPROVED: 'APPROVED',
-  VOIDED: 'VOIDED',
-  COMPLETED: 'COMPLETED',
-  PAYER_ACTION_REQUIRED: 'PAYER_ACTION_REQUIRED',
-} as const;
-
-export type TPaypalStatus = keyof typeof PAYPAL_STATUS;
 
 export type TMinimalPaypalOrder = {
   id: string;

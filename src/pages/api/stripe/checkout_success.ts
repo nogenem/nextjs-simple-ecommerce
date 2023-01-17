@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { env } from '~/env/server.mjs';
-import { STRIPE_CHECKOUT_STATUS } from '~/features/stripe/constants';
+import { STRIPE_CHECKOUT_STATUS } from '~/features/stripe/constants/status';
 import type { TStripeMetadata } from '~/features/stripe/utils/api';
 import { getSessionById } from '~/features/stripe/utils/api';
 import { getServerAuthSession } from '~/server/common/get-server-auth-session';

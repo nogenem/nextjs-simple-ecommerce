@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { env } from '~/env/server.mjs';
 import { protectedProcedure, router } from '~/server/trpc/trpc';
 
-import { STRIPE_CHECKOUT_STATUS } from './constants';
+import { STRIPE_CHECKOUT_STATUS } from './constants/status';
 import { createSession } from './utils/api';
 
 export const stripeRouter = router({
