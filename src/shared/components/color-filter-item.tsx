@@ -12,7 +12,7 @@ import type { RouterOutputs } from '../utils/trpc';
 const ColorFilterItem = ({
   color,
 }: {
-  color: RouterOutputs['attributes']['all'][number];
+  color: RouterOutputs['attributes']['byType'][number];
 }) => {
   const { pathname, query } = useRouter();
   const activeBorderColor = useColorModeValue('primary.600', 'white');

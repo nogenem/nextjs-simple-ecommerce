@@ -1,10 +1,12 @@
 import type { RouterInputs, RouterOutputs } from '~/shared/utils/trpc';
 import { trpc } from '~/shared/utils/trpc';
 
-const EMPTY_ARRAY: RouterOutputs['attributes']['all'] = [];
+const EMPTY_ARRAY: RouterOutputs['attributes']['byType'] = [];
 
-export const useAttributes = (filters: RouterInputs['attributes']['all']) => {
-  const query = trpc.attributes.all.useQuery(filters);
+export const useAttributesByType = (
+  input: RouterInputs['attributes']['byType'],
+) => {
+  const query = trpc.attributes.byType.useQuery(input);
 
   return {
     attributes: query.data || EMPTY_ARRAY,

@@ -109,8 +109,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   });
 
   await Promise.all([
-    ssg.attributes.all.prefetch({ type: AttributeType.Size }),
-    ssg.attributes.all.prefetch({ type: AttributeType.Color }),
+    ssg.attributes.byType.prefetch({ type: AttributeType.Size }),
+    ssg.attributes.byType.prefetch({ type: AttributeType.Color }),
     ssg.categories.all.prefetch(),
     ssg.products.home.prefetch(getOnlyValidFilters(ctx.query)),
     ssg.cart.sumItemsQuantities.prefetch(),

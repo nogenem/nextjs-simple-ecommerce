@@ -1,27 +1,10 @@
-import { AttributeType } from '@prisma/client';
-import { z } from 'zod';
-
 import { publicProcedure, router } from '~/server/trpc/trpc';
 
+import { attributesByTypeRouteInputSchema } from './schemas';
+import { getAttributesByType } from './service/get-attributes-by-type';
+
 export const attributesRouter = router({
-  all: publicProcedure
-    .input(
-      z.object({
-        type: z.nativeEnum(AttributeType).optional(),
-      }),
-    )
-    .query(async ({ input, ctx }) => {
-      return ctx.prisma.attribute.findMany({
-        select: {
-          id: true,
-          type: true,
-          name: true,
-          value: true,
-        },
-        orderBy: [{ type: 'asc' }, { name: 'asc' }],
-        where: {
-          type: input.type,
-        },
-      });
-    }),
+  byType: publicProcedure
+    .input(attributesByTypeRouteInputSchema)
+    .query(async ({ input }) => getAttributesByType(input)),
 });

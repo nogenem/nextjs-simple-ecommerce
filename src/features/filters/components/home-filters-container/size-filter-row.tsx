@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { Box, Flex, Link, useColorModeValue } from '@chakra-ui/react';
 import { AttributeType } from '@prisma/client';
 
-import { useAttributes } from '~/features/attributes/hooks';
+import { useAttributesByType } from '~/features/attributes/hooks';
 import { URL_QUERY_KEYS } from '~/features/filters/constants/url-query-keys';
 import type { RouterOutputs } from '~/shared/utils/trpc';
 
@@ -12,7 +12,7 @@ import { FilterRowHeader } from './filter-row-header';
 
 const SizeFilterRow = () => {
   const { attributes: sizes, areTheAttributesLoading: areTheSizesLoading } =
-    useAttributes({
+    useAttributesByType({
       type: AttributeType.Size,
     });
 
@@ -35,7 +35,7 @@ const SizeFilterRow = () => {
 const SizeFilterItem = ({
   size,
 }: {
-  size: RouterOutputs['attributes']['all'][number];
+  size: RouterOutputs['attributes']['byType'][number];
 }) => {
   const { pathname, query } = useRouter();
   const activeColor = useColorModeValue('primary.600', 'white');

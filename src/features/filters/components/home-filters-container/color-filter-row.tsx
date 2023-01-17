@@ -1,7 +1,7 @@
 import { Box, Flex } from '@chakra-ui/react';
 import { AttributeType } from '@prisma/client';
 
-import { useAttributes } from '~/features/attributes/hooks';
+import { useAttributesByType } from '~/features/attributes/hooks';
 import { URL_QUERY_KEYS } from '~/features/filters/constants/url-query-keys';
 import { ColorFilterItem } from '~/shared/components';
 
@@ -9,7 +9,7 @@ import { FilterRowHeader } from './filter-row-header';
 
 const ColorFilterRow = () => {
   const { attributes: colors, areTheAttributesLoading: areTheColorsLoading } =
-    useAttributes({
+    useAttributesByType({
       type: AttributeType.Color,
     });
 
