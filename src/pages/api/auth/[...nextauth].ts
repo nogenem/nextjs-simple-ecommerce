@@ -18,7 +18,7 @@ import {
   TEMP_CART_COOKIE_DATA,
   TEMP_CART_COOKIE_KEY,
 } from '~/shared/constants/cookies';
-import type { CartWithItems } from '~/shared/types/globals';
+import type { TCartWithItems } from '~/shared/types/globals';
 
 export const authOptions = (
   req: NextApiRequest | GetServerSidePropsContext['req'],
@@ -39,7 +39,7 @@ export const authOptions = (
       const cookies = nookies.get({ req });
       const tempCart = JSON.parse(
         cookies[TEMP_CART_COOKIE_KEY] || '{}',
-      ) as CartWithItems;
+      ) as TCartWithItems;
 
       await saveOrMergeTempCart(tempCart, user.id, prisma);
 

@@ -15,7 +15,7 @@ export type NextPageWithLayout = NextPage & {
   getLayout?: (page: React.ReactElement) => React.ReactNode;
 };
 
-export type CartWithItems = Cart & {
+export type TCartWithItems = Cart & {
   items: CartItem[];
 };
 

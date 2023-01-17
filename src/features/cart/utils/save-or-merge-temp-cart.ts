@@ -1,9 +1,9 @@
 import type { CartItem, Prisma, PrismaClient } from '@prisma/client';
 
-import type { CartWithItems } from '~/shared/types/globals';
+import type { TCartWithItems } from '~/shared/types/globals';
 
 export const saveOrMergeTempCart = async (
-  tempCart: CartWithItems,
+  tempCart: TCartWithItems,
   userId: string,
   prisma: PrismaClient,
 ) => {

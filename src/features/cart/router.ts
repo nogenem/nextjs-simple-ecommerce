@@ -10,8 +10,8 @@ import {
   TEMP_CART_COOKIE_KEY,
 } from '~/shared/constants/cookies';
 import type {
-  CartWithItems,
   TCartItemWithVariant,
+  TCartWithItems,
 } from '~/shared/types/globals';
 import type { RouterInputs } from '~/shared/utils/trpc';
 
@@ -256,7 +256,7 @@ export const cartRouter = router({
 const getTempCart = (ctx: Context) => {
   const cookies = nookies.get(ctx);
 
-  return JSON.parse(cookies[TEMP_CART_COOKIE_KEY] || '{}') as CartWithItems;
+  return JSON.parse(cookies[TEMP_CART_COOKIE_KEY] || '{}') as TCartWithItems;
 };
 
 const addItemToLoggedInUserCart = async (
