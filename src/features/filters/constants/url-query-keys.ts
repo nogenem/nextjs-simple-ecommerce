@@ -1,5 +1,3 @@
-import { z } from 'zod';
-
 export const SORT_OPTIONS = [
   'price-asc',
   'price-desc',
@@ -16,23 +14,3 @@ export const URL_QUERY_KEYS = {
   SEARCH: 'search',
   SORT: 'sort',
 };
-
-export const URL_QUERY_KEYS_VALIDATIONS = {
-  [URL_QUERY_KEYS.CATEGORY_ID]: z.string().min(1),
-  [URL_QUERY_KEYS.MIN_PRICE]: z.string().refine((val) => {
-    const n = Number(val);
-    return !Number.isNaN(n) && n >= 0;
-  }),
-  [URL_QUERY_KEYS.MAX_PRICE]: z.string().refine((val) => {
-    const n = Number(val);
-    return !Number.isNaN(n) && n >= 1;
-  }),
-  [URL_QUERY_KEYS.COLOR_ID]: z.string().min(1),
-  [URL_QUERY_KEYS.SIZE_ID]: z.string().min(1),
-  [URL_QUERY_KEYS.SEARCH]: z.string().min(1),
-  [URL_QUERY_KEYS.SORT]: z.enum(SORT_OPTIONS),
-};
-
-export const URL_QUERY_KEYS_SCHEME = z
-  .object(URL_QUERY_KEYS_VALIDATIONS)
-  .partial();

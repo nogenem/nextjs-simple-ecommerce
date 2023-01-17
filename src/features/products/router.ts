@@ -12,12 +12,10 @@ import { z } from 'zod';
 
 import { type Context } from '~/server/trpc/context';
 import { publicProcedure, router } from '~/server/trpc/trpc';
+import { urlQueryKeysSchema } from '~/shared/schemas';
 
 import type { SORT_OPTIONS } from '../filters/constants/url-query-keys';
-import {
-  URL_QUERY_KEYS,
-  URL_QUERY_KEYS_SCHEME,
-} from '../filters/constants/url-query-keys';
+import { URL_QUERY_KEYS } from '../filters/constants/url-query-keys';
 
 type THomeProductVariant = Variant & {
   attributes: Attribute[];
@@ -34,7 +32,7 @@ const MYSQL_MAX_INT_VALUE = 2147483647;
 
 export const productsRouter = router({
   home: publicProcedure
-    .input(URL_QUERY_KEYS_SCHEME)
+    .input(urlQueryKeysSchema)
     .query(async ({ ctx, input }) => {
       const categoryId = input[URL_QUERY_KEYS.CATEGORY_ID]?.toString();
       const minPrice = +(input[URL_QUERY_KEYS.MIN_PRICE] || '') * 100;

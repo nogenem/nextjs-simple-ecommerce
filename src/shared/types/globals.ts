@@ -1,7 +1,6 @@
 import type { NextPage } from 'next';
 
 import type {
-  Address,
   Attribute,
   Cart,
   CartItem,
@@ -30,5 +29,3 @@ export type TCartItemWithVariant = CartItem & {
       })
     | undefined;
 };
-
-export type TAddressSchema = Omit<Address, 'id' | 'created_at' | 'updated_at'>;

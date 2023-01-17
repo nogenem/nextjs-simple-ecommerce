@@ -8,6 +8,7 @@ import {
   TEMP_CART_COOKIE_DATA,
   TEMP_CART_COOKIE_KEY,
 } from '~/shared/constants/cookies';
+import { addressSchema } from '~/shared/schemas';
 import { calculateShippingCost } from '~/shared/utils/calculate-shipping-cost';
 
 import { calculateCartSubtotal } from '../cart/utils/calculate-cart-subtotal';
@@ -19,14 +20,7 @@ export const ordersRouter = router({
   placeOrder: protectedProcedure
     .input(
       z.object({
-        shippingAddress: z.object({
-          country: z.string().min(1),
-          postal_code: z.string().min(1),
-          state: z.string().min(1),
-          city: z.string().min(1),
-          street_address: z.string().min(1),
-          complement: z.string().min(0),
-        }),
+        shippingAddress: addressSchema,
         paymentMethod: z.nativeEnum(PaymentMethod),
       }),
     )

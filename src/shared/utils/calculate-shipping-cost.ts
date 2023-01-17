@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import type { TAddressSchema } from '../types/globals';
+import type { TAddressSchema } from '../schemas';
 
 export const calculateShippingCost = (
   address: TAddressSchema,

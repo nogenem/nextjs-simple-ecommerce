@@ -28,7 +28,6 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { PaymentMethod } from '@prisma/client';
-import { z } from 'zod';
 
 import { useProtectedRoute } from '~/features/auth/hooks';
 import { CartItemsTable } from '~/features/cart/components';
@@ -38,25 +37,11 @@ import { hasAnyInvalidItem } from '~/features/cart/utils/has-any-invalid-item';
 import { usePlaceOrder } from '~/features/orders/hooks';
 import { CenteredLoadingIndicator } from '~/shared/components';
 import { useObjState } from '~/shared/hooks';
-import type {
-  TAddressSchema,
-  TCartItemWithVariant,
-} from '~/shared/types/globals';
+import type { TAddressSchema, TPaymentMethodSchema } from '~/shared/schemas';
+import { addressSchema, paymentMethodSchema } from '~/shared/schemas';
+import type { TCartItemWithVariant } from '~/shared/types/globals';
 import { calculateShippingCost } from '~/shared/utils/calculate-shipping-cost';
 import { formatPrice } from '~/shared/utils/format-price';
-
-const AddressSchema = z.object({
-  country: z.string().min(1),
-  postal_code: z.string().min(1),
-  state: z.string().min(1),
-  city: z.string().min(1),
-  street_address: z.string().min(1),
-  complement: z.string().min(0),
-});
-
-const PaymentMethodSchema = z.nativeEnum(PaymentMethod);
-
-type TPaymentMethodSchema = z.infer<typeof PaymentMethodSchema>;
 
 type CheckoutState = {
   address?: TAddressSchema;
@@ -93,7 +78,7 @@ const CheckoutPage: NextPage = () => {
   }
 
   const handleShippingAddressTabSubmit = (address: TAddressSchema) => {
-    const parsedData = AddressSchema.safeParse(address);
+    const parsedData = addressSchema.safeParse(address);
     if (!parsedData.success) {
       toast({
         title: 'Some data entered is invalid or missing.',
@@ -110,7 +95,7 @@ const CheckoutPage: NextPage = () => {
   };
 
   const handlePaymentMethodTabSubmit = (paymentMethod: string) => {
-    const parsedData = PaymentMethodSchema.safeParse(paymentMethod);
+    const parsedData = paymentMethodSchema.safeParse(paymentMethod);
     if (!parsedData.success) {
       toast({
         title: 'Some data entered is invalid or missing.',

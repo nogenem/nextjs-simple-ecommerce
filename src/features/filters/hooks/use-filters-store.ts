@@ -1,17 +1,15 @@
 import type Router from 'next/router';
 
-import type { z } from 'zod';
 import create from 'zustand';
 import { devtools } from 'zustand/middleware';
 
-import type { URL_QUERY_KEYS_SCHEME } from '../constants/url-query-keys';
-import {
-  URL_QUERY_KEYS,
-  URL_QUERY_KEYS_VALIDATIONS,
-} from '../constants/url-query-keys';
+import type { TUrlQueryKeysSchema } from '~/shared/schemas';
+import { urlQueryKeysSchemas } from '~/shared/schemas';
+
+import { URL_QUERY_KEYS } from '../constants/url-query-keys';
 
 type TRouterQuery = typeof Router.query;
-type TFilters = z.infer<typeof URL_QUERY_KEYS_SCHEME>;
+type TFilters = TUrlQueryKeysSchema;
 
 type TFiltersState = {
   filters: TFilters;
@@ -60,8 +58,8 @@ export const getOnlyValidFilters = (filters: TRouterQuery): TFilters => {
   Object.entries(filters).forEach(([key, value]) => {
     const validator =
       !!keysToTrueObj[key] &&
-      !!URL_QUERY_KEYS_VALIDATIONS[key] &&
-      URL_QUERY_KEYS_VALIDATIONS[key];
+      !!urlQueryKeysSchemas[key] &&
+      urlQueryKeysSchemas[key];
     const parsedScheme = !!validator && validator.safeParse(value);
 
     if (!!parsedScheme && parsedScheme.success) {
