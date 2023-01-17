@@ -154,8 +154,10 @@ const getHomeProducts = async (
   `;
 
   // Find the products
-  const productsResults: (Product & { minDiscountedPrice: number })[] =
-    await ctx.prisma.$queryRaw`SELECT
+  const productsResults: (Product & {
+    minDiscountedPrice: number;
+    maxDiscountedPrice: number;
+  })[] = await ctx.prisma.$queryRaw`SELECT
     p.id,
     p.slug,
     p.name,
@@ -222,7 +224,7 @@ const getHomeProducts = async (
   // Select the variants
   const productsIds = productsResults.map((p) => p.id);
   const variantsResultsPromise: Promise<
-    (Variant & { discountedPrice: number })[]
+    (Variant & { minDiscountedPrice: number; maxDiscountedPrice: number })[]
   > = ctx.prisma.$queryRaw`SELECT
     v.*,
     ${minDiscountedPriceWithStockClause} minDiscountedPrice,
@@ -329,7 +331,7 @@ const getHomeProducts = async (
 
   const productId2VariantsObj = variantsResults.reduce(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (prev, { discountedPrice, ...rest }) => {
+    (prev, { minDiscountedPrice, maxDiscountedPrice, ...rest }) => {
       const val: THomeProductVariant = {
         ...rest,
         attributes: attributesObj[rest.id]!,
@@ -350,7 +352,7 @@ const getHomeProducts = async (
   // Assemble the final object
   const finalResults: THomeProduct[] = productsResults.map(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    ({ minDiscountedPrice, ...rest }) => {
+    ({ minDiscountedPrice, maxDiscountedPrice, ...rest }) => {
       return {
         ...rest,
         category: categoriesObj[rest.categoryId]!,
