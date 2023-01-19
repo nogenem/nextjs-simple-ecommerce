@@ -1,15 +1,7 @@
 import { publicProcedure, router } from '~/server/trpc/trpc';
 
+import { getAllCategories } from './service/get-all-categories';
+
 export const categoriesRouter = router({
-  all: publicProcedure.query(async ({ ctx }) => {
-    return ctx.prisma.category.findMany({
-      select: {
-        id: true,
-        name: true,
-      },
-      orderBy: {
-        name: 'asc',
-      },
-    });
-  }),
+  all: publicProcedure.query(() => getAllCategories()),
 });
