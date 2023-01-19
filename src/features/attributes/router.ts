@@ -1,7 +1,7 @@
 import { publicProcedure, router } from '~/server/trpc/trpc';
 
 import { attributesByTypeRouteInputSchema } from './schemas';
-import { getAttributesByType } from './service/get-attributes-by-type';
+import { getAttributesByType } from './services';
 
 export const attributesRouter = router({
   byType: publicProcedure
