@@ -1,20 +1,10 @@
 import { CurrencyCode, PaymentMethod } from '@prisma/client';
-import Stripe from 'stripe';
 
-import { env } from '~/env/server.mjs';
 import { transformPriceToPaymentFormat } from '~/shared/utils/transform-price-to-payment-format';
 
-const APP_SECRET = env.STRIPE_SECRET;
+import { stripe } from '../stripe';
 
-const stripe = new Stripe(APP_SECRET, {
-  apiVersion: '2022-11-15',
-});
-
-export type TStripeMetadata = {
-  orderId: string;
-};
-
-export const createSession = (
+export const createStripeSession = (
   orderId: string,
   baseUrl: string,
   userEmail: string,
@@ -48,8 +38,4 @@ export const createSession = (
     mode: 'payment',
     customer_email: userEmail,
   });
-};
-
-export const getSessionById = (sessionId: string) => {
-  return stripe.checkout.sessions.retrieve(sessionId);
 };

@@ -1,39 +1,22 @@
 import { TRPCError } from '@trpc/server';
-import { z } from 'zod';
 
 import { env } from '~/env/server.mjs';
 import { protectedProcedure, router } from '~/server/trpc/trpc';
 
-import { STRIPE_CHECKOUT_STATUS } from './constants/status';
-import { createSession } from './utils/api';
+import { createStripeSessionRouteInputSchema } from './schemas';
+import {
+  createStripeSession,
+  getUninitializedStripeOrder,
+  updateCreatedStripeOrder,
+} from './services';
 
 export const stripeRouter = router({
   createSession: protectedProcedure
-    .input(
-      z.object({
-        orderId: z.string().min(1),
-      }),
-    )
+    .input(createStripeSessionRouteInputSchema)
     .mutation(async ({ ctx, input }) => {
-      const user = ctx.session.user;
-      const order = await ctx.prisma.order.findFirst({
-        where: {
-          id: input.orderId,
-          userId: user.id,
-          paidAt: null,
-          paymentDetail: {
-            paymentMethodId: null,
-            paymentMethodStatus: null,
-          },
-        },
-        include: {
-          user: {
-            select: {
-              email: true,
-            },
-          },
-        },
-      });
+      const { user } = ctx.session;
+
+      const order = await getUninitializedStripeOrder(input.orderId, user.id);
 
       if (!order) {
         throw new TRPCError({
@@ -43,7 +26,7 @@ export const stripeRouter = router({
       }
 
       const baseUrl = ctx.req?.headers.origin || env.NEXTAUTH_URL;
-      const session = await createSession(
+      const session = await createStripeSession(
         order.id,
         baseUrl,
         order.user.email || '',
@@ -51,19 +34,7 @@ export const stripeRouter = router({
         order.currency_code,
       );
 
-      await ctx.prisma.order.update({
-        where: {
-          id: order.id,
-        },
-        data: {
-          paymentDetail: {
-            update: {
-              paymentMethodId: session.id,
-              paymentMethodStatus: STRIPE_CHECKOUT_STATUS.CREATED,
-            },
-          },
-        },
-      });
+      await updateCreatedStripeOrder(input.orderId, user.id, session.id);
 
       return session.url;
     }),

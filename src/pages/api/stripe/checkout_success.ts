@@ -1,11 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { env } from '~/env/server.mjs';
-import { STRIPE_CHECKOUT_STATUS } from '~/features/stripe/constants/status';
-import type { TStripeMetadata } from '~/features/stripe/utils/api';
-import { getSessionById } from '~/features/stripe/utils/api';
+import {
+  getPaidStripeOrder,
+  getStripeSessionById,
+  updatePaidStripeOrder,
+} from '~/features/stripe/services';
+import type { TStripeMetadata } from '~/features/stripe/stripe';
 import { getServerAuthSession } from '~/server/common/get-server-auth-session';
-import { prisma } from '~/server/db/client';
 
 export default async function handler(
   req: NextApiRequest,
@@ -32,7 +34,7 @@ export default async function handler(
 
   let session = null;
   try {
-    session = await getSessionById(sessionId);
+    session = await getStripeSessionById(sessionId);
   } catch (err) {
     console.error(
       'Error while retrieving stripe session',
@@ -58,22 +60,11 @@ export default async function handler(
   }
 
   const { orderId } = session.metadata as TStripeMetadata;
-  const order = await prisma.order.findFirst({
-    where: {
-      id: orderId,
-      userId: authSession.user.id,
-      paidAt: null,
-      paymentDetail: {
-        paymentMethodId: session.id,
-        paymentMethodStatus: {
-          not: STRIPE_CHECKOUT_STATUS.COMPLETED,
-        },
-      },
-    },
-    include: {
-      items: true,
-    },
-  });
+  const order = await getPaidStripeOrder(
+    orderId,
+    authSession.user.id,
+    session.id,
+  );
 
   if (!order || session.payment_status !== 'paid') {
     return res.redirect(
@@ -81,36 +72,7 @@ export default async function handler(
     );
   }
 
-  await prisma.$transaction([
-    prisma.order.update({
-      where: {
-        id: order.id,
-      },
-      data: {
-        paidAt: new Date(),
-        paymentDetail: {
-          update: {
-            paymentMethodStatus: STRIPE_CHECKOUT_STATUS.COMPLETED,
-          },
-        },
-      },
-    }),
-    ...order.items.map((item) =>
-      prisma.variant.update({
-        where: {
-          id: item.variantId,
-        },
-        data: {
-          quantity_in_stock: {
-            decrement: item.quantity,
-          },
-          sold_amount: {
-            increment: item.quantity,
-          },
-        },
-      }),
-    ),
-  ]);
+  await updatePaidStripeOrder(order, authSession.user.id, session.id);
 
   return res.redirect(`${baseUrl}/order/${order.id}?stripe_success=true`);
 }

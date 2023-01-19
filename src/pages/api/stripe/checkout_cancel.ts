@@ -1,11 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { env } from '~/env/server.mjs';
-import { STRIPE_CHECKOUT_STATUS } from '~/features/stripe/constants/status';
-import type { TStripeMetadata } from '~/features/stripe/utils/api';
-import { getSessionById } from '~/features/stripe/utils/api';
+import {
+  getStripeSessionById,
+  unpaidStripeOrderExists,
+  updateCanceledStripeOrder,
+} from '~/features/stripe/services';
+import type { TStripeMetadata } from '~/features/stripe/stripe';
 import { getServerAuthSession } from '~/server/common/get-server-auth-session';
-import { prisma } from '~/server/db/client';
 
 export default async function handler(
   req: NextApiRequest,
@@ -32,7 +34,7 @@ export default async function handler(
 
   let session = null;
   try {
-    session = await getSessionById(sessionId);
+    session = await getStripeSessionById(sessionId);
   } catch (err) {
     console.error(
       'Error while retrieving stripe session',
@@ -58,37 +60,17 @@ export default async function handler(
   }
 
   const { orderId } = session.metadata as TStripeMetadata;
-  const order = await prisma.order.findFirst({
-    where: {
-      id: orderId,
-      userId: authSession.user.id,
-      paidAt: null,
-      paymentDetail: {
-        paymentMethodId: session.id,
-        paymentMethodStatus: {
-          not: STRIPE_CHECKOUT_STATUS.COMPLETED,
-        },
-      },
-    },
-  });
+  const orderExists = await unpaidStripeOrderExists(
+    orderId,
+    authSession.user.id,
+    session.id,
+  );
 
-  if (!order || session.payment_status === 'paid') {
+  if (!orderExists || session.payment_status === 'paid') {
     return res.redirect(`${baseUrl}/order/${orderId}`);
   }
 
-  await prisma.order.update({
-    where: {
-      id: order.id,
-    },
-    data: {
-      paymentDetail: {
-        update: {
-          paymentMethodId: null,
-          paymentMethodStatus: null,
-        },
-      },
-    },
-  });
+  await updateCanceledStripeOrder(orderId, authSession.user.id, session.id);
 
-  return res.redirect(`${baseUrl}/order/${order.id}`);
+  return res.redirect(`${baseUrl}/order/${orderId}`);
 }
