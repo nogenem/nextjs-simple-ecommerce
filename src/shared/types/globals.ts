@@ -1,4 +1,9 @@
-import type { NextPage } from 'next';
+import type {
+  GetServerSidePropsContext,
+  NextApiRequest,
+  NextApiResponse,
+  NextPage,
+} from 'next';
 
 import type {
   Attribute,
@@ -29,3 +34,9 @@ export type TCartItemWithVariant = CartItem & {
       })
     | undefined;
 };
+
+export type TContextRequest = NextApiRequest | GetServerSidePropsContext['req'];
+
+export type TContextResponse =
+  | NextApiResponse
+  | GetServerSidePropsContext['res'];

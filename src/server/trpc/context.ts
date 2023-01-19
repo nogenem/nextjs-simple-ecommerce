@@ -1,10 +1,8 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
 import { type Session } from 'next-auth';
-
-import { type CreateNextContextOptions } from '@trpc/server/adapters/next';
 
 import { getServerAuthSession } from '~/server/common/get-server-auth-session';
 import { prisma } from '~/server/db/client';
+import type { TContextRequest, TContextResponse } from '~/shared/types/globals';
 
 type CreateContextOptions = {
   session: Session | null;
@@ -14,8 +12,8 @@ type CreateContextOptions = {
 export type Context = {
   session: Session | null;
   prisma: typeof prisma;
-  req?: NextApiRequest;
-  res?: NextApiResponse;
+  req?: TContextRequest;
+  res?: TContextResponse;
 };
 
 /** Use this helper for:
@@ -38,9 +36,10 @@ export const createContextInner = async (
  * This is the actual context you'll use in your router
  * @link https://trpc.io/docs/context
  **/
-export const createContext = async (
-  opts: CreateNextContextOptions,
-): Promise<Context> => {
+export const createContext = async (opts: {
+  req: TContextRequest;
+  res: TContextResponse;
+}): Promise<Context> => {
   const { req, res } = opts;
 
   // Get the session from the server using the unstable_getServerSession wrapper function

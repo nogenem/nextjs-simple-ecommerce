@@ -17,7 +17,7 @@ import { getOnlyValidFilters } from '~/features/filters/utils/get-only-valid-fil
 import { ProductCard } from '~/features/products/components';
 import { useHomeProducts } from '~/features/products/hooks';
 import { useHandleStripeQueryKeys } from '~/features/stripe/hooks';
-import { createContextInner } from '~/server/trpc/context';
+import { createContext } from '~/server/trpc/context';
 import { appRouter } from '~/server/trpc/router';
 import { CenteredAlert, CenteredLoadingIndicator } from '~/shared/components';
 
@@ -105,7 +105,7 @@ const HeaderFilters = ({ productsLen }: { productsLen: number }) => {
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const ssg = createProxySSGHelpers({
     router: appRouter,
-    ctx: await createContextInner({ session: null }),
+    ctx: await createContext({ req: ctx.req, res: ctx.res }),
     transformer: superjson,
   });
 
