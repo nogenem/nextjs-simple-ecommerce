@@ -12,7 +12,8 @@ import {
   SearchFilter,
   SortFilter,
 } from '~/features/filters/components';
-import { getOnlyValidFilters, useFiltersSync } from '~/features/filters/hooks';
+import { useFiltersSync } from '~/features/filters/hooks';
+import { getOnlyValidFilters } from '~/features/filters/utils/get-only-valid-filters';
 import { ProductCard } from '~/features/products/components';
 import { useHomeProducts } from '~/features/products/hooks';
 import { useHandleStripeQueryKeys } from '~/features/stripe/hooks';
