@@ -1,31 +1,29 @@
 import { TRPCError } from '@trpc/server';
-import { z } from 'zod';
 
 import { protectedProcedure, router } from '~/server/trpc/trpc';
 
-import { PAYPAL_STATUS } from './constants/status';
-import { capturePaypalPayment, createPaypalOrder } from './utils/api';
+import {
+  cancelPaypalOrderRouteInputSchema,
+  createPaypalOrderRouteInputSchema,
+  fulfillPaypalOrderRouteInputSchema,
+} from './schemas';
+import {
+  capturePaypalApiPayment,
+  createPaypalApiOrder,
+  getUninitializedPaypalOrder,
+  getUnpaidPaypalOrder,
+  unpaidPaypalOrderExists,
+  updateCanceledPaypalOrder,
+  updateCreatedPaypalOrder,
+  updatePaidPaypalOrder,
+} from './services';
 
 export const paypalRouter = router({
   createOrder: protectedProcedure
-    .input(
-      z.object({
-        orderId: z.string().min(1),
-      }),
-    )
+    .input(createPaypalOrderRouteInputSchema)
     .mutation(async ({ ctx, input }) => {
       const user = ctx.session.user;
-      const order = await ctx.prisma.order.findFirst({
-        where: {
-          id: input.orderId,
-          userId: user.id,
-          paidAt: null,
-          paymentDetail: {
-            paymentMethodId: null,
-            paymentMethodStatus: null,
-          },
-        },
-      });
+      const order = await getUninitializedPaypalOrder(input.orderId, user.id);
 
       if (!order) {
         throw new TRPCError({
@@ -34,96 +32,47 @@ export const paypalRouter = router({
         });
       }
 
-      const paypalOrder = await createPaypalOrder(
+      const paypalApiOrder = await createPaypalApiOrder(
         order.totalPrice,
         order.currency_code,
       );
 
-      await ctx.prisma.order.update({
-        where: {
-          id: order.id,
-        },
-        data: {
-          paymentDetail: {
-            update: {
-              paymentMethodId: paypalOrder.id,
-              paymentMethodStatus: paypalOrder.status,
-            },
-          },
-        },
-      });
+      await updateCreatedPaypalOrder(input.orderId, user.id, paypalApiOrder);
 
-      return paypalOrder.id;
+      return paypalApiOrder.id;
     }),
   cancelOrder: protectedProcedure
-    .input(
-      z.object({
-        orderId: z.string().min(1),
-        paypalOrderId: z.string().min(1),
-      }),
-    )
+    .input(cancelPaypalOrderRouteInputSchema)
     .mutation(async ({ ctx, input }) => {
       const user = ctx.session.user;
-      const order = await ctx.prisma.order.findFirst({
-        where: {
-          id: input.orderId,
-          userId: user.id,
-          paidAt: null,
-          paymentDetail: {
-            paymentMethodId: input.paypalOrderId,
-            paymentMethodStatus: {
-              not: PAYPAL_STATUS.COMPLETED,
-            },
-          },
-        },
-      });
+      const orderExists = await unpaidPaypalOrderExists(
+        input.orderId,
+        user.id,
+        input.paypalApiOrderId,
+      );
 
-      if (!order) {
+      if (!orderExists) {
         throw new TRPCError({
           code: 'NOT_FOUND',
           message: 'Order not found.',
         });
       }
 
-      return await ctx.prisma.order.update({
-        where: {
-          id: order.id,
-        },
-        data: {
-          paymentDetail: {
-            update: {
-              paymentMethodId: null,
-              paymentMethodStatus: null,
-            },
-          },
-        },
-      });
+      return updateCanceledPaypalOrder(
+        input.orderId,
+        user.id,
+        input.paypalApiOrderId,
+      );
     }),
   fulfillOrder: protectedProcedure
-    .input(
-      z.object({
-        orderId: z.string().min(1),
-        paypalOrderId: z.string().min(1),
-      }),
-    )
+    .input(fulfillPaypalOrderRouteInputSchema)
     .mutation(async ({ ctx, input }) => {
       const user = ctx.session.user;
-      const order = await ctx.prisma.order.findFirst({
-        where: {
-          id: input.orderId,
-          userId: user.id,
-          paidAt: null,
-          paymentDetail: {
-            paymentMethodId: input.paypalOrderId,
-            paymentMethodStatus: {
-              not: PAYPAL_STATUS.COMPLETED,
-            },
-          },
-        },
-        include: {
-          items: true,
-        },
-      });
+      const order = await getUnpaidPaypalOrder(
+        input.orderId,
+        user.id,
+        input.paypalApiOrderId,
+      );
 
       if (!order) {
         throw new TRPCError({
@@ -132,62 +81,33 @@ export const paypalRouter = router({
         });
       }
 
-      let paypalOrder = null;
-      let apiError = null;
+      let paypalApiOrder = null;
+      let paypalApiError = null;
       try {
-        paypalOrder = await capturePaypalPayment(input.paypalOrderId);
+        paypalApiOrder = await capturePaypalApiPayment(input.paypalApiOrderId);
       } catch (err) {
-        apiError = err;
+        paypalApiError = err;
       }
 
-      if (!paypalOrder || apiError) {
-        await ctx.prisma.order.update({
-          where: {
-            id: order.id,
-          },
-          data: {
-            paymentDetail: {
-              update: {
-                paymentMethodId: null,
-                paymentMethodStatus: null,
-              },
-            },
-          },
+      if (!paypalApiOrder || !!paypalApiError) {
+        await updateCanceledPaypalOrder(
+          input.orderId,
+          user.id,
+          input.paypalApiOrderId,
+        );
+
+        console.error(paypalApiError);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Paypal API returned an error.',
         });
-
-        throw apiError;
       }
 
-      const [updatedOrder] = await ctx.prisma.$transaction([
-        ctx.prisma.order.update({
-          where: {
-            id: order.id,
-          },
-          data: {
-            paidAt: new Date(),
-            paymentDetail: {
-              update: {
-                paymentMethodStatus: paypalOrder.status,
-              },
-            },
-          },
-        }),
-        ...order.items.map((item) =>
-          ctx.prisma.variant.update({
-            where: {
-              id: item.variantId,
-            },
-            data: {
-              quantity_in_stock: {
-                decrement: item.quantity,
-              },
-              sold_amount: {
-                increment: item.quantity,
-              },
-            },
-          }),
-        ),
-      ]);
+      const [updatedOrder] = await updatePaidPaypalOrder(
+        order,
+        user.id,
+        input.paypalApiOrderId,
+      );
 
       return updatedOrder;
     }),

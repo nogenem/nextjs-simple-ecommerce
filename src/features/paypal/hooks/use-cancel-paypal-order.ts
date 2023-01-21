@@ -10,7 +10,7 @@ export const useCancelPaypalOrder = () => {
   });
 
   return {
-    cancelPaypalOrder: mutation.mutate,
+    cancelPaypalOrderAsync: mutation.mutateAsync,
     isCancelingPaypalOrder: mutation.isLoading,
   };
 };

@@ -21,7 +21,7 @@ export const useFulfillPaypalOrder = () => {
   });
 
   return {
-    fulfillPaypalOrder: mutation.mutate,
+    fulfillPaypalOrderAsync: mutation.mutateAsync,
     isFulfillingPaypalOrder: mutation.isLoading,
   };
 };

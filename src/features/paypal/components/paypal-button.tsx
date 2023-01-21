@@ -24,28 +24,23 @@ const PaypalButton = ({ order }: TPaypalButtonProps) => {
   const toast = useToast();
 
   const { createPaypalOrderAsync } = useCreatePaypalOrder();
-  const { cancelPaypalOrder } = useCancelPaypalOrder();
-  const { fulfillPaypalOrder, isFulfillingPaypalOrder } =
+  const { cancelPaypalOrderAsync, isCancelingPaypalOrder } =
+    useCancelPaypalOrder();
+  const { fulfillPaypalOrderAsync, isFulfillingPaypalOrder } =
     useFulfillPaypalOrder();
 
-  const handleCreateOrder: PayPalButtonsComponentProps['createOrder'] = () =>
-    createPaypalOrderAsync({ orderId: order.id });
+  const handleCreateOrder: PayPalButtonsComponentProps['createOrder'] = () => {
+    return createPaypalOrderAsync({ orderId: order.id });
+  };
 
-  const handleApprove: PayPalButtonsComponentProps['onApprove'] = async (
-    data,
-  ) =>
-    fulfillPaypalOrder({
-      orderId: order.id,
-      paypalOrderId: data.orderID,
-    });
+  const handleError: PayPalButtonsComponentProps['onError'] = async () => {
+    try {
+      // Just to be sure...
+      await cancelPaypalOrderAsync({ orderId: order.id });
+    } catch (err) {
+      console.error(err);
+    }
 
-  const handleCancel: PayPalButtonsComponentProps['onCancel'] = (data) =>
-    cancelPaypalOrder({
-      orderId: order.id,
-      paypalOrderId: (data.orderID || data.id) as string,
-    });
-
-  const handleError: PayPalButtonsComponentProps['onError'] = () => {
     toast({
       title: 'Unable to process the payment.',
       description: 'Please, try again later',
@@ -53,6 +48,32 @@ const PaypalButton = ({ order }: TPaypalButtonProps) => {
       isClosable: true,
       duration: 5000,
     });
+  };
+
+  const handleApprove: PayPalButtonsComponentProps['onApprove'] = async (
+    data,
+  ) => {
+    try {
+      await fulfillPaypalOrderAsync({
+        orderId: order.id,
+        paypalApiOrderId: data.orderID,
+      });
+    } catch (err) {
+      handleError({ err });
+    }
+  };
+
+  const handleCancel: PayPalButtonsComponentProps['onCancel'] = async (
+    data,
+  ) => {
+    try {
+      await cancelPaypalOrderAsync({
+        orderId: order.id,
+        paypalApiOrderId: (data.orderID || data.id) as string,
+      });
+    } catch (err) {
+      handleError({ err });
+    }
   };
 
   return (
@@ -68,7 +89,7 @@ const PaypalButton = ({ order }: TPaypalButtonProps) => {
         onApprove={handleApprove}
         onCancel={handleCancel}
         onError={handleError}
-        isLoading={isFulfillingPaypalOrder}
+        isLoading={isFulfillingPaypalOrder || isCancelingPaypalOrder}
       />
     </PayPalScriptProvider>
   );
