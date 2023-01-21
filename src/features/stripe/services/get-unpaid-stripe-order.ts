@@ -4,7 +4,7 @@ import { prisma } from '~/server/db/client';
 
 import { STRIPE_CHECKOUT_STATUS } from '../constants/status';
 
-export const getPaidStripeOrder = (
+export const getUnpaidStripeOrder = (
   orderId: string,
   userId: string,
   sessionId: string,

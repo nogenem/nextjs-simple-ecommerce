@@ -2,8 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { env } from '~/env/server.mjs';
 import {
-  getPaidStripeOrder,
   getStripeSessionById,
+  getUnpaidStripeOrder,
   updatePaidStripeOrder,
 } from '~/features/stripe/services';
 import type { TStripeMetadata } from '~/features/stripe/stripe';
@@ -60,7 +60,7 @@ export default async function handler(
   }
 
   const { orderId } = session.metadata as TStripeMetadata;
-  const order = await getPaidStripeOrder(
+  const order = await getUnpaidStripeOrder(
     orderId,
     authSession.user.id,
     session.id,
