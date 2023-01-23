@@ -3,8 +3,8 @@ import { trpc } from '~/shared/utils/trpc';
 
 const EMPTY_ARRAY: RouterOutputs['orders']['listForTable'] = [];
 
-export const useOrdersForTable = (loggedInUserOnly = false) => {
-  const query = trpc.orders.listForTable.useQuery({ loggedInUserOnly });
+export const useOrdersForTable = () => {
+  const query = trpc.orders.listForTable.useQuery();
 
   return {
     orders: query.data || EMPTY_ARRAY,

@@ -12,6 +12,7 @@ export const usePlaceOrder = () => {
   const mutation = trpc.orders.placeOrder.useMutation({
     onSuccess: (data) => {
       utils.orders.invalidate();
+      utils.cart.invalidate();
 
       router.push(`/order/${data.id}`);
     },
