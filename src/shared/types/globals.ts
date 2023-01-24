@@ -40,3 +40,8 @@ export type TContextRequest = NextApiRequest | GetServerSidePropsContext['req'];
 export type TContextResponse =
   | NextApiResponse
   | GetServerSidePropsContext['res'];
+
+export type TNookiesContext = {
+  req?: TContextRequest;
+  res?: TContextResponse;
+};

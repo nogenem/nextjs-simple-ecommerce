@@ -1,15 +1,10 @@
 import { TRPCError } from '@trpc/server';
-import nookies from 'nookies';
 
 import { protectedProcedure, router } from '~/server/trpc/trpc';
-import {
-  TEMP_CART_COOKIE_DATA,
-  TEMP_CART_COOKIE_KEY,
-} from '~/shared/constants/cookies';
 import { calculateShippingCost } from '~/shared/utils/calculate-shipping-cost';
 
+import { getUserCartItems } from '../cart/services/user';
 import { calculateCartSubtotal } from '../cart/utils/calculate-cart-subtotal';
-import { getLoggedInUserCartItems } from '../cart/utils/get-logged-in-user-cart-items';
 import { hasAnyInvalidItem } from '../cart/utils/has-any-invalid-item';
 import {
   orderByIdRouteInputSchema,
@@ -31,7 +26,7 @@ export const ordersRouter = router({
     .input(placeOrderRouteInputSchema)
     .mutation(async ({ ctx, input }) => {
       const user = ctx.session.user;
-      const items = await getLoggedInUserCartItems(user.id, ctx);
+      const items = await getUserCartItems(user.id);
 
       if (items.length === 0 || hasAnyInvalidItem(items)) {
         throw new TRPCError({
@@ -56,8 +51,6 @@ export const ordersRouter = router({
         userId: user.id,
         items,
       });
-
-      nookies.destroy(ctx, TEMP_CART_COOKIE_KEY, TEMP_CART_COOKIE_DATA);
 
       return order;
     }),

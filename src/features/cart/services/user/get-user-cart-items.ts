@@ -1,10 +1,7 @@
-import type { Context } from '~/server/trpc/context';
+import { prisma } from '~/server/db/client';
 
-export const getLoggedInUserCartItems = async (
-  userId: string,
-  ctx: Context,
-) => {
-  const items = await ctx.prisma.cartItem.findMany({
+export const getUserCartItems = async (userId: string) => {
+  const items = await prisma.cartItem.findMany({
     where: {
       cart: {
         userId,

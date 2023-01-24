@@ -9,16 +9,14 @@ import GoogleProvider from 'next-auth/providers/google';
 
 // Prisma adapter for NextAuth, optional and can be removed
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import nookies from 'nookies';
 
 import { env } from '~/env/server.mjs';
-import { saveOrMergeTempCart } from '~/features/cart/utils/save-or-merge-temp-cart';
-import { prisma } from '~/server/db/client';
 import {
-  TEMP_CART_COOKIE_DATA,
-  TEMP_CART_COOKIE_KEY,
-} from '~/shared/constants/cookies';
-import type { TCartWithItems } from '~/shared/types/globals';
+  deleteGuestCart,
+  saveOrMergeGuestCartIntoUserCart,
+} from '~/features/cart/services/guest';
+import { saveUserCartIntoGuestCart } from '~/features/cart/services/user';
+import { prisma } from '~/server/db/client';
 
 export const authOptions = (
   req: NextApiRequest | GetServerSidePropsContext['req'],
@@ -36,38 +34,15 @@ export const authOptions = (
   },
   events: {
     signIn: async ({ user }) => {
-      const cookies = nookies.get({ req });
-      const tempCart = JSON.parse(
-        cookies[TEMP_CART_COOKIE_KEY] || '{}',
-      ) as TCartWithItems;
+      await saveOrMergeGuestCartIntoUserCart({ req, res }, user.id);
 
-      await saveOrMergeTempCart(tempCart, user.id, prisma);
-
-      nookies.destroy({ res }, TEMP_CART_COOKIE_KEY, {
-        path: '/',
-      });
+      deleteGuestCart({ req, res });
     },
     signOut: async (message) => {
       // PS: I dunno why, but this is the session i'm getting...
       const session = message.session as unknown as AdapterSession;
 
-      const cart = await prisma.cart.findFirst({
-        where: {
-          userId: session.userId,
-        },
-        include: {
-          items: true,
-        },
-      });
-
-      if (!!cart) {
-        nookies.set(
-          { res },
-          TEMP_CART_COOKIE_KEY,
-          JSON.stringify(cart),
-          TEMP_CART_COOKIE_DATA,
-        );
-      }
+      await saveUserCartIntoGuestCart({ req, res }, session.userId);
     },
   },
   // Configure one or more authentication providers
