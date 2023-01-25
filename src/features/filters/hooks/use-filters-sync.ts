@@ -2,18 +2,16 @@ import { useEffect } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useFiltersActions } from './use-filters-store';
+import { useFilters, useFiltersActions } from './use-filters-store';
 
 export const useFiltersSync = () => {
   const router = useRouter();
   const { setFilters } = useFiltersActions();
+  const { areTheFiltersInitialized } = useFilters();
 
-  useEffect(() => {
-    if (router.isReady) {
-      setFilters(router.query);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.isReady]);
+  if (!areTheFiltersInitialized) {
+    setFilters(router.query);
+  }
 
   useEffect(() => {
     const handleRouteChange = (url: string) => {

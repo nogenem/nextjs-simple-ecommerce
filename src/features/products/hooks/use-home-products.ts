@@ -1,13 +1,13 @@
-import { INITIAL_EMPTY_FILTERS, useFilters } from '~/features/filters/hooks';
+import { useFilters } from '~/features/filters/hooks';
 import type { RouterOutputs } from '~/shared/utils/trpc';
 import { trpc } from '~/shared/utils/trpc';
 
 const EMPTY_ARRAY: RouterOutputs['products']['home'] = [];
 
 export const useHomeProducts = () => {
-  const filters = useFilters();
+  const { filters, areTheFiltersInitialized } = useFilters();
   const query = trpc.products.home.useQuery(filters, {
-    enabled: filters !== INITIAL_EMPTY_FILTERS,
+    enabled: areTheFiltersInitialized,
   });
 
   return {

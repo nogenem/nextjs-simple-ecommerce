@@ -18,7 +18,7 @@ type TFiltersState = {
   };
 };
 
-export const INITIAL_EMPTY_FILTERS = {} as TFilters;
+const INITIAL_EMPTY_FILTERS = {} as TFilters;
 
 const useFiltersStore = create<TFiltersState>()(
   devtools(
@@ -47,12 +47,23 @@ const useFiltersStore = create<TFiltersState>()(
   ),
 );
 
-export const useFilters = () => useFiltersStore((state) => state.filters);
+export const useFilters = () => {
+  const filters = useFiltersStore((state) => state.filters);
+  return {
+    filters,
+    areTheFiltersInitialized: filters !== INITIAL_EMPTY_FILTERS,
+  };
+};
 
 export const useFilterByKey = (key: string) =>
   useFiltersStore((state) => state.filters[key]);
 
 export const useFiltersActions = () =>
   useFiltersStore((state) => state.actions);
+
+export const manuallySetFilters = (filters: TRouterQuery) =>
+  useFiltersStore.setState({
+    filters: getOnlyValidFilters(filters),
+  });
 
 export type { TFilters };

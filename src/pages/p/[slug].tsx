@@ -1,7 +1,7 @@
 import { useMemo, useState, type ChangeEvent } from 'react';
 import { MdOutlineAddShoppingCart } from 'react-icons/md';
 
-import type { NextPage } from 'next';
+import type { GetServerSidePropsContext, NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
@@ -21,16 +21,24 @@ import {
 } from '@chakra-ui/react';
 import type { Attribute, VariantImage } from '@prisma/client';
 import { AttributeType } from '@prisma/client';
+import { createProxySSGHelpers } from '@trpc/react-query/ssg';
+import superjson from 'superjson';
 
 import {
   useAddItemToCart,
   useCountCartItemsByProductId,
 } from '~/features/cart/hooks';
 import { URL_QUERY_KEYS } from '~/features/filters/constants/url-query-keys';
-import { useFilters, useFiltersSync } from '~/features/filters/hooks';
+import {
+  manuallySetFilters,
+  useFilters,
+  useFiltersSync,
+} from '~/features/filters/hooks';
 import { useProductBySlug } from '~/features/products/hooks';
 import { ImagesCarousel } from '~/features/variant-images/components';
 import { useProductVariantByFilters } from '~/features/variants/hooks';
+import { createContext } from '~/server/trpc/context';
+import { appRouter } from '~/server/trpc/router';
 import {
   CenteredAlert,
   CenteredLoadingIndicator,
@@ -51,7 +59,7 @@ const ProductPage: NextPage = () => {
     ? router.query.slug[0]
     : router.query.slug;
 
-  const filters = useFilters();
+  const { filters } = useFilters();
   const { product, isProductLoading } = useProductBySlug(slug);
   const variant = useProductVariantByFilters(product);
   const { count: countCartItemsByProductId } = useCountCartItemsByProductId(
@@ -322,5 +330,31 @@ const getProductAttributesByType = (
 
   return attrs;
 };
+
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const ssg = createProxySSGHelpers({
+    router: appRouter,
+    ctx: await createContext({ req: ctx.req, res: ctx.res }),
+    transformer: superjson,
+  });
+
+  const slug = Array.isArray(ctx.query.slug)
+    ? ctx.query.slug[0]
+    : ctx.query.slug;
+
+  manuallySetFilters(ctx.query);
+
+  const product = await ssg.products.bySlug.fetch({ slug: slug || '' });
+  await Promise.all([
+    ssg.cart.sumItemsQuantities.prefetch(),
+    ssg.cart.countItemsByProductId.prefetch({ productId: product?.id || '' }),
+  ]);
+
+  return {
+    props: {
+      trpcState: ssg.dehydrate(),
+    },
+  };
+}
 
 export default ProductPage;

@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+
 import { useRouter } from 'next/router';
 
 import type { Attribute } from '@prisma/client';
@@ -16,8 +18,26 @@ export const useProductVariantByFilters = (
   product: RouterOutputs['products']['bySlug'] | undefined,
 ) => {
   const router = useRouter();
-  const filters = useFilters();
+  const { filters, areTheFiltersInitialized } = useFilters();
 
+  const newQuery = useRef<Record<string, string> | undefined>(undefined);
+
+  useEffect(() => {
+    if (newQuery.current) {
+      const url = {
+        pathname: router.pathname,
+        query: {
+          ...router.query,
+          ...newQuery.current,
+        },
+      };
+
+      newQuery.current = undefined;
+      router.push(url, undefined, { shallow: true });
+    }
+  }, [router, newQuery]);
+
+  if (!areTheFiltersInitialized) return undefined;
   if (!product || product.variants.length === 0) return null;
 
   const possibleVariants = product.variants.filter((v) =>
@@ -25,7 +45,7 @@ export const useProductVariantByFilters = (
       .map((attr) => attr.id === filters[attributeTypeToFiltersKey(attr)])
       .some((bool) => !!bool),
   );
-  const variant = possibleVariants.find((v) =>
+  let variant = possibleVariants.find((v) =>
     v.attributes
       .map((attr) => attr.id === filters[attributeTypeToFiltersKey(attr)])
       .every((bool) => !!bool),
@@ -33,23 +53,14 @@ export const useProductVariantByFilters = (
 
   // If variant not found, push the most appropriate variant available
   if (!variant) {
-    const newVariant =
+    variant =
       getMostAppropriateVariant(possibleVariants, filters) ||
       product.variants[0];
 
-    const newQuery = newVariant?.attributes.reduce((prev, curr) => {
+    newQuery.current = variant?.attributes.reduce((prev, curr) => {
       prev[attributeTypeToFiltersKey(curr)] = curr.id;
       return prev;
     }, {} as Record<string, string>);
-
-    const url = {
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        ...newQuery,
-      },
-    };
-    router.push(url);
   }
 
   return variant;
@@ -62,7 +73,7 @@ const getMostAppropriateVariant = (
   possibleVariants: NonNullable<
     RouterOutputs['products']['bySlug']
   >['variants'],
-  filters: ReturnType<typeof useFilters>,
+  filters: ReturnType<typeof useFilters>['filters'],
 ) => {
   const getAttributeWeight = (attr: Attribute) =>
     +(attr.id === filters[attributeTypeToFiltersKey(attr)]) *
