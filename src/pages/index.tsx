@@ -12,7 +12,7 @@ import {
   SearchFilter,
   SortFilter,
 } from '~/features/filters/components';
-import { useFiltersSync } from '~/features/filters/hooks';
+import { manuallySetFilters, useFiltersSync } from '~/features/filters/hooks';
 import { getOnlyValidFilters } from '~/features/filters/utils/get-only-valid-filters';
 import { ProductCard } from '~/features/products/components';
 import { useHomeProducts } from '~/features/products/hooks';
@@ -22,10 +22,10 @@ import { appRouter } from '~/server/trpc/router';
 import { CenteredAlert, CenteredLoadingIndicator } from '~/shared/components';
 
 const HomePage: NextPage = () => {
-  const { products, areTheHomeProductsLoading } = useHomeProducts();
-
   useFiltersSync();
   useHandleStripeQueryKeys();
+
+  const { products, areTheHomeProductsLoading } = useHomeProducts();
 
   return (
     <>
@@ -108,6 +108,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
     ctx: await createContext({ req: ctx.req, res: ctx.res }),
     transformer: superjson,
   });
+
+  manuallySetFilters(ctx.query);
 
   await Promise.all([
     ssg.attributes.byType.prefetch({ type: AttributeType.Size }),
