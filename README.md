@@ -18,8 +18,29 @@ yarn dev
 
 - [x] Add debound to the min/max price inputs in /?
 
-- [ ] Add some sorting options to the home page
+- [x] Add some sorting options to the home page
 
-- [ ] Add a search input to the home page and/or the navbar
+- [x] Add a search input to the home page and/or the navbar
 
-- [ ] Add the variants' colors to the ProductCard
+- [ ] Add the variants' colors to the ProductCard !?
+
+- [ ] Try to lower the amount of data on first load of the home page !?
+
+- [ ] Use pagination/infinite loading on the home page and on the orders page !?
+
+- [ ] Add tests to the project
+
+- [ ] Handle the shipping addresses better !?
+
+  - Allow used to save and edit them;
+  - That can be a problem cause the user shouldn't be allowed to do that on addresses that are on orders already paid;
+
+- [ ] Handle the product stock better !?
+
+  - [There should be a table with the stock and we should lock the products when a user put them on their carts](https://stackoverflow.com/a/17483270);
+  - The problem here is that we should release that "lock" after X minutes/hours/days if the user doesn't finish the purchage;
+  - This could make getting the amount of items left in stock more... annoying;
+
+- [ ] Add other forms of login, like with other OAuth options and a local option !?
+
+- [ ] Add an Admin section for the site to allow the management of products, orders and so on and to show stats/graphs of sells
