@@ -145,7 +145,7 @@ const OrderPage: NextPage = () => {
         <TabList>
           <Tab isDisabled={step !== 0}>Shipping Address</Tab>
           <Tab isDisabled={step !== 1}>Payment Method</Tab>
-          <Tab isDisabled={step !== 2}>Place Order</Tab>
+          <Tab isDisabled={step !== 2}>Order</Tab>
         </TabList>
 
         <TabPanels maxW="65rem">
