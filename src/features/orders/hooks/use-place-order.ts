@@ -1,20 +1,13 @@
-import { useRouter } from 'next/router';
-
 import { useToast } from '@chakra-ui/react';
 
 import { trpc } from '~/shared/utils/trpc';
 
 export const usePlaceOrder = () => {
   const toast = useToast();
-  const router = useRouter();
-  const utils = trpc.useContext();
 
   const mutation = trpc.orders.placeOrder.useMutation({
-    onSuccess: (data) => {
-      utils.orders.invalidate();
-      utils.cart.invalidate();
-
-      router.push(`/order/${data.id}`);
+    onSuccess: async (data) => {
+      location.href = `/order/${data.id}`;
     },
     onError: () => {
       toast({
