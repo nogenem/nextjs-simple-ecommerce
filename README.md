@@ -1,5 +1,9 @@
 # Simple Ecommerce
 
+Just a simple project to learn a bit about the `t3-stack`, `NextJs`, `Stripe` and `Paypal`.
+
+[Some images of the project.](https://imgur.com/a/rVZNH2O)
+
 ## Start dev commands
 
 ```shell
