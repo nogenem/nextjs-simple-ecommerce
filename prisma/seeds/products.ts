@@ -4,17 +4,6 @@ import { AttributeType } from '@prisma/client';
 import { getRandomArbitrary } from '../utils';
 
 export const seeder = async (prisma: PrismaClient) => {
-  console.log('>> Deleting product data...');
-  await Promise.all([
-    prisma.cart.deleteMany(),
-    prisma.cartItem.deleteMany(),
-    prisma.category.deleteMany(),
-    prisma.attribute.deleteMany(),
-    prisma.variantImage.deleteMany(),
-    prisma.variant.deleteMany(),
-    prisma.product.deleteMany(),
-  ]);
-
   // Categories
   console.log('>> Creating categories...');
   const categoriesPromises: Promise<Category>[] = CATEGORIES.map((category) =>
