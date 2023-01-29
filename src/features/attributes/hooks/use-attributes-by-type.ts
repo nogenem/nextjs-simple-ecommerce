@@ -4,9 +4,9 @@ import { trpc } from '~/shared/utils/trpc';
 const EMPTY_ARRAY: RouterOutputs['attributes']['byType'] = [];
 
 export const useAttributesByType = (
-  input: RouterInputs['attributes']['byType'],
+  type: RouterInputs['attributes']['byType'],
 ) => {
-  const query = trpc.attributes.byType.useQuery(input);
+  const query = trpc.attributes.byType.useQuery(type);
 
   return {
     attributes: query.data || EMPTY_ARRAY,
