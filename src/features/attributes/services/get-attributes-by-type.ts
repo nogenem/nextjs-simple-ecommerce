@@ -1,8 +1,8 @@
+import type { AttributeType } from '@prisma/client';
+
 import { prisma } from '~/server/db/client';
 
-import type { TAttributesByTypeRouteInputSchema } from '../schemas';
-
-export const getAttributesByType = (input: TAttributesByTypeRouteInputSchema) =>
+export const getAttributesByType = (type: AttributeType) =>
   prisma.attribute.findMany({
     select: {
       id: true,
@@ -11,7 +11,7 @@ export const getAttributesByType = (input: TAttributesByTypeRouteInputSchema) =>
       value: true,
     },
     where: {
-      type: input.type,
+      type,
     },
     orderBy: { name: 'asc' },
   });
