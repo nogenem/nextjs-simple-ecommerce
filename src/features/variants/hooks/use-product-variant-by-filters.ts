@@ -22,6 +22,8 @@ export const useProductVariantByFilters = (
 
   const newQuery = useRef<Record<string, string> | undefined>(undefined);
 
+  let variant = undefined;
+
   useEffect(() => {
     if (newQuery.current) {
       const url = {
@@ -37,15 +39,23 @@ export const useProductVariantByFilters = (
     }
   }, [router, newQuery]);
 
-  if (!areTheFiltersInitialized) return undefined;
-  if (!product || product.variants.length === 0) return null;
+  if (!areTheFiltersInitialized)
+    return {
+      variant,
+      isVariantLoading: true,
+    };
+  if (!product || product.variants.length === 0)
+    return {
+      variant,
+      isVariantLoading: false,
+    };
 
   const possibleVariants = product.variants.filter((v) =>
     v.attributes
       .map((attr) => attr.id === filters[attributeTypeToFiltersKey(attr)])
       .some((bool) => !!bool),
   );
-  let variant = possibleVariants.find((v) =>
+  variant = possibleVariants.find((v) =>
     v.attributes
       .map((attr) => attr.id === filters[attributeTypeToFiltersKey(attr)])
       .every((bool) => !!bool),
@@ -63,7 +73,7 @@ export const useProductVariantByFilters = (
     }, {} as Record<string, string>);
   }
 
-  return variant;
+  return { variant, isVariantLoading: false };
 };
 
 const attributeTypeToFiltersKey = (attribute: Attribute) =>

@@ -61,7 +61,7 @@ const ProductPage: NextPage = () => {
 
   const { filters } = useFilters();
   const { product, isProductLoading } = useProductBySlug(slug);
-  const variant = useProductVariantByFilters(product);
+  const { variant, isVariantLoading } = useProductVariantByFilters(product);
   const { count: countCartItemsByProductId } = useCountCartItemsByProductId(
     product?.id,
   );
@@ -81,7 +81,7 @@ const ProductPage: NextPage = () => {
   const discountedPriceTextColor = useColorModeValue('gray.600', 'gray.300');
   const soldOutTextColor = useColorModeValue('red.600', 'red.300');
 
-  if (isProductLoading || variant === undefined) {
+  if (isProductLoading || isVariantLoading) {
     return (
       <>
         <PageHead />
@@ -90,7 +90,7 @@ const ProductPage: NextPage = () => {
     );
   }
 
-  if (!product || variant === null) {
+  if (!product || !variant) {
     return (
       <>
         <PageHead />
