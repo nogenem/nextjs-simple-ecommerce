@@ -1,5 +1,3 @@
-import { useRef } from 'react';
-
 import { type NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -16,16 +14,13 @@ import {
 import { CartItemsTable } from '~/features/cart/components';
 import { useCartItems } from '~/features/cart/hooks';
 import { hasAnyInvalidItem } from '~/features/cart/utils/has-any-invalid-item';
-import { useHorizontalScroll } from '~/shared/hooks';
 
 const CartPage: NextPage = () => {
   const router = useRouter();
-  const tableContainerRef = useRef<HTMLDivElement>(null);
-  const { items } = useCartItems();
 
   const primaryColor = useColorModeValue('primary.500', 'primary.300');
 
-  useHorizontalScroll(tableContainerRef);
+  const { items } = useCartItems();
 
   const cartHasAnyInvalidItem = hasAnyInvalidItem(items);
 

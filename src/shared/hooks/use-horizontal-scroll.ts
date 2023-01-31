@@ -1,28 +1,37 @@
-import type { RefObject } from 'react';
-import { useEffect } from 'react';
+import { useCallback, useRef } from 'react';
 
-export const useHorizontalScroll = (ref: RefObject<HTMLDivElement>) => {
-  useEffect(() => {
-    const element = ref.current;
+export const useHorizontalScroll = <T extends HTMLElement>() => {
+  const ref = useRef<T | null>(null);
 
-    const handleOnWheel = (event: WheelEvent) => {
-      event.preventDefault();
+  const handleOnWheel = (event: WheelEvent) => {
+    if (!ref.current || !isOverflown(ref.current)) return;
 
-      if (!element) return;
+    event.preventDefault();
 
-      element.scrollBy({
-        left: event.deltaY < 0 ? -30 : 30,
-      });
-    };
+    ref.current.scrollBy({
+      left: event.deltaY < 0 ? -30 : 30,
+    });
+  };
 
-    if (element) {
-      element.addEventListener('wheel', handleOnWheel);
+  // IDEA SOURCE: https://medium.com/@teh_builder/ref-objects-inside-useeffect-hooks-eb7c15198780
+  const setRef = useCallback((node: T) => {
+    if (ref.current) {
+      ref.current.removeEventListener('wheel', handleOnWheel);
     }
 
-    return () => {
-      if (element) {
-        element.removeEventListener('wheel', handleOnWheel);
-      }
-    };
-  }, [ref]);
+    if (node) {
+      node.addEventListener('wheel', handleOnWheel);
+    }
+
+    ref.current = node;
+  }, []);
+
+  return [setRef];
 };
+
+function isOverflown(element: HTMLElement) {
+  return (
+    element.scrollHeight > element.clientHeight ||
+    element.scrollWidth > element.clientWidth
+  );
+}

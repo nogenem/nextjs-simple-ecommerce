@@ -1,5 +1,3 @@
-import { useRef } from 'react';
-
 import NextImage from 'next/image';
 
 import { Box, useColorModeValue } from '@chakra-ui/react';
@@ -20,12 +18,10 @@ const ImagesCarousel = ({
   selectedImageIndex,
   onImageClick,
 }: TImagesCarouselProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-
   const containerBorderColor = useColorModeValue('gray.300', 'gray.600');
   const wrapperBorderColor = useColorModeValue('primary.500', 'primary.300');
 
-  useHorizontalScroll(containerRef);
+  const [containerRef] = useHorizontalScroll<HTMLDivElement>();
 
   return (
     <Box

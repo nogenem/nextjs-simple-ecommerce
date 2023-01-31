@@ -1,5 +1,3 @@
-import { useRef } from 'react';
-
 import type { TableContainerProps } from '@chakra-ui/react';
 import {
   Table,
@@ -28,13 +26,11 @@ const CartItemsTable = ({
   isEditable = false,
   ...rest
 }: TCartItemsTableProps) => {
-  const tableContainerRef = useRef<HTMLDivElement>(null);
-
   const primaryColor = useColorModeValue('primary.500', 'primary.300');
 
-  const { items, areTheItemsLoading } = useCartItems();
+  const [tableContainerRef] = useHorizontalScroll<HTMLDivElement>();
 
-  useHorizontalScroll(tableContainerRef);
+  const { items, areTheItemsLoading } = useCartItems();
 
   const cartSubtotal = formatPrice(calculateCartSubtotal(items));
 

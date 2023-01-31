@@ -1,5 +1,3 @@
-import { useRef } from 'react';
-
 import type { TableContainerProps } from '@chakra-ui/react';
 import {
   Table,
@@ -22,9 +20,7 @@ type TOrdersTableProps = {
 } & TableContainerProps;
 
 const OrdersTable = ({ orders, isLoading, ...rest }: TOrdersTableProps) => {
-  const tableContainerRef = useRef<HTMLDivElement>(null);
-
-  useHorizontalScroll(tableContainerRef);
+  const [tableContainerRef] = useHorizontalScroll<HTMLDivElement>();
 
   return (
     <TableContainer ref={tableContainerRef} w="100%" {...rest}>
